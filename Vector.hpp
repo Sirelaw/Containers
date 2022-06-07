@@ -45,8 +45,8 @@ namespace ft
 		vecIterator<T>&							operator--() { --_ptr; return (*this); }
 		vecIterator<T>							operator++(int) {vecIterator<T> temp(*this); ++_ptr; return (temp); };
 		vecIterator<T>							operator--(int) {vecIterator<T> temp(*this); --_ptr; return (temp); }
-		vecIterator<T>							operator+(const difference_type& movement) const { vecIterator<T> temp(*this); temp += movement; return (temp); }
-		vecIterator<T>							operator-(const difference_type& movement) const { vecIterator<T> temp(*this); temp -= movement; return (temp); }
+		vecIterator<T>							operator+(const difference_type& movement) const { vecIterator<T> temp(*this); /* temp += movement */; return (temp); }
+		vecIterator<T>							operator-(const difference_type& movement) const { vecIterator<T> temp(*this); /* temp -= movement */; return (temp); }
 
 		difference_type							operator-(const vecIterator<T>& rawIterator) const { return (this->getPtr() - rawIterator.getPtr()); }
 
@@ -82,8 +82,8 @@ namespace ft
 		vecReverseIterator<T>&					operator--() { ++(this->_ptr); return (*this); }
 		vecReverseIterator<T>					operator++(int) {vecReverseIterator<T> temp(*this); --this->_ptr; return (temp); }
 		vecReverseIterator<T>					operator--(int) {vecReverseIterator<T> temp(*this); ++this->_ptr; return (temp); }
-		vecReverseIterator<T>					operator+(const difference_type& movement) const { vecReverseIterator<T> temp(*this); temp -= movement; return (temp); }
-		vecReverseIterator<T>					operator-(const difference_type& movement) const { vecReverseIterator<T> temp(*this); temp += movement; return (temp); }
+		vecReverseIterator<T>					operator+(const difference_type& movement) const { vecReverseIterator<T> temp(*this); /* temp -= movement; */ return (temp); }
+		vecReverseIterator<T>					operator-(const difference_type& movement) const { vecReverseIterator<T> temp(*this); /* temp += movement; */ return (temp); }
 
 		difference_type							operator-(const vecIterator<T>& rawIterator) const { return (rawIterator.getPtr() - this->getPtr()); }
 
@@ -117,8 +117,8 @@ namespace ft
 		iterator								end(){ return iterator(&_vec[_size]); }
 		const_iterator							cbegin() const { return const_iterator(&_vec[0]); }
 		const_iterator							cend() const { return const_iterator(&_vec[_size]); }
-		reverse_iterator						rbegin(){ return reverse_iterator(_vec[_size - 1]); }
-		reverse_iterator						rend(){ return reverse_iterator(_vec[-1]); }
+		reverse_iterator						rbegin(){ return reverse_iterator(&_vec[_size - 1]); }
+		reverse_iterator						rend(){ return reverse_iterator(&_vec[-1]); }
 		const_reverse_iterator					crbegin() const { return const_reverse_iterator(&_vec[_size - 1]); }
 		const_reverse_iterator					crend() const { return const_reverse_iterator(&_vec[-1]); }
 
@@ -233,14 +233,16 @@ namespace ft
 				_alloc.destroy(iter);
 			_size = 0;
 		}
-		// iterator 								insert( iterator pos, const T& value ){
-		// 	difference_type	step = pos - begin();
-		// 	T				temp;
+		iterator 								insert( iterator pos, const T& value ){
+			difference_type	step = pos - begin();
 
-		// 	reserve(size() + 1);
-		// 	pos = begin() + step;
-		// 	for ()
-		// }
+			reserve(size() + 1);
+			pos = begin() + step;
+			for (reverse_iterator r_iter = rbegin(); pos != r_iter; ++r_iter){
+				_alloc.construct(r_iter, T(*(r_iter + 1)));
+			}
+			_alloc.construct(pos, T(value));
+		}
 		// void 									insert( iterator pos, size_type count, const T& value );
 		// template< class InputIt >
 		// void 									insert( iterator pos, InputIt first, InputIt last );

@@ -21,6 +21,7 @@ int main()
 	stdvec.push_back(3);
 	countvec.push_back(2);
 	stdvec.push_back(3);
+	// countvec.insert(countvec.begin(), 17);
 	// countvec = vect;
 	// stdvec.push_back(7);
 	// stdvec.assign(7, 22);
