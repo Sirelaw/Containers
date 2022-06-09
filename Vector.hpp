@@ -29,7 +29,6 @@ namespace ft
 
 		vecIterator<T>&							operator=(T* ptr) { _ptr = ptr; return *this; }
 		
-		operator								bool() const { return (_ptr ? true : false); }
 		operator								pointer() const { return (_ptr); }
 
 		bool									operator==(const vecIterator<T>& rawIterator)const{return (_ptr == rawIterator.getConstPtr()); }
@@ -45,8 +44,8 @@ namespace ft
 		vecIterator<T>&							operator--() { --_ptr; return (*this); }
 		vecIterator<T>							operator++(int) {vecIterator<T> temp(*this); ++_ptr; return (temp); };
 		vecIterator<T>							operator--(int) {vecIterator<T> temp(*this); --_ptr; return (temp); }
-		vecIterator<T>							operator+(const difference_type& movement) const { vecIterator<T> temp(*this); /* temp += movement */; return (temp); }
-		vecIterator<T>							operator-(const difference_type& movement) const { vecIterator<T> temp(*this); /* temp -= movement */; return (temp); }
+		vecIterator<T>							operator+(const difference_type& movement) const { vecIterator<T> temp(*this); temp += movement; return (temp); }
+		vecIterator<T>							operator-(const difference_type& movement) const { vecIterator<T> temp(*this); temp -= movement; return (temp); }
 
 		difference_type							operator-(const vecIterator<T>& rawIterator) const { return (this->getPtr() - rawIterator.getPtr()); }
 
@@ -82,8 +81,8 @@ namespace ft
 		vecReverseIterator<T>&					operator--() { ++(this->_ptr); return (*this); }
 		vecReverseIterator<T>					operator++(int) {vecReverseIterator<T> temp(*this); --this->_ptr; return (temp); }
 		vecReverseIterator<T>					operator--(int) {vecReverseIterator<T> temp(*this); ++this->_ptr; return (temp); }
-		vecReverseIterator<T>					operator+(const difference_type& movement) const { vecReverseIterator<T> temp(*this); /* temp -= movement; */ return (temp); }
-		vecReverseIterator<T>					operator-(const difference_type& movement) const { vecReverseIterator<T> temp(*this); /* temp += movement; */ return (temp); }
+		vecReverseIterator<T>					operator+(const difference_type& movement) const { vecReverseIterator<T> temp(*this); temp -= movement; return (temp); }
+		vecReverseIterator<T>					operator-(const difference_type& movement) const { vecReverseIterator<T> temp(*this); temp += movement; return (temp); }
 
 		difference_type							operator-(const vecIterator<T>& rawIterator) const { return (rawIterator.getPtr() - this->getPtr()); }
 
@@ -233,24 +232,87 @@ namespace ft
 				_alloc.destroy(iter);
 			_size = 0;
 		}
-		iterator 								insert( iterator pos, const T& value ){
+
+		iterator 								insert( iterator pos, const T& value )
+		{
 			difference_type	step = pos - begin();
 
 			reserve(size() + 1);
 			pos = begin() + step;
-			for (reverse_iterator r_iter = rbegin(); pos != r_iter; ++r_iter){
-				_alloc.construct(r_iter, T(*(r_iter + 1)));
-			}
+			for (reverse_iterator r_iter = rbegin(); pos <= r_iter; ++r_iter)
+				_alloc.construct(r_iter + 1, T(*r_iter));
 			_alloc.construct(pos, T(value));
+			++_size;
+			return (pos);
 		}
-		// void 									insert( iterator pos, size_type count, const T& value );
+
+		void 									insert( iterator pos, size_type count, const T& value )
+		{
+			difference_type	step = pos - begin();
+
+			reserve(size() + count);
+			pos = begin() + step;
+			for (reverse_iterator r_iter = rbegin(); pos <= r_iter; ++r_iter)
+				_alloc.construct(r_iter + count, T(*r_iter));
+			for(size_type i = count; i; --i)
+				_alloc.construct(pos + i - 1, T(value));
+			_size += count;
+		}
+
 		// template< class InputIt >
-		// void 									insert( iterator pos, InputIt first, InputIt last );
+		// void 									insert( iterator pos, InputIt first, InputIt last )
+		// {
+		// 	difference_type	step = pos - begin();
+		// 	size_type		count = last - first;
+
+		// 	reserve(size() + count);
+		// 	pos = begin() + step;
+		// 	for (reverse_iterator r_iter = rbegin(); pos <= r_iter; ++r_iter)
+		// 		_alloc.construct(r_iter + count, T(*r_iter));
+		// 	for(size_type i = count; i; --i)
+		// 		_alloc.construct(pos + i - 1, T(*(--last)));
+		// 	_size += count;
+		// }
+
+		iterator erase( iterator pos )
+		{
+			for (iterator iter = pos; iter < end(); ++iter)
+				*iter = *(iter + 1);
+			_alloc.destroy((end() - 1).getPtr());
+			--_size;
+			return pos;
+		}
+		iterator erase( iterator first, iterator last )
+		{
+			difference_type	count = last - first;
+
+			for (iterator iter = first; iter < last; ++iter)
+				*iter = *(iter + count);
+			for (reverse_iterator r_iter = rbegin(); r_iter >= end() - count; ++r_iter)
+				_alloc.destroy(r_iter.getPtr());
+			_size -= count;
+			return first;
+		}
+
 		void									push_back(const T& value)
 		{
 			if (_size == _capacity)
 				reserve(_capacity ? _capacity * 2 : 1);
-			_alloc.construct(_vec + _size++, T(value));
+			_alloc.construct(begin() + _size++, T(value));
+		}
+
+		void									pop_back() { _alloc.destroy(rbegin()); --_size; }
+
+		void									resize( size_type count )
+		{
+			if (count > size()){ reserve(count);
+				while (size() < count)
+					push_back(T());
+			}
+			else{
+				while (size() != count)
+					pop_back();
+			}
 		}
 
 		void									reserve(size_type new_cap)
@@ -262,11 +324,11 @@ namespace ft
 				temp = _alloc.allocate(new_cap);
 				ret = temp;
 				for (iterator iter = begin(); iter != end(); ++iter, ++temp){
-					_alloc.construct(temp, T(*iter));
-					_alloc.destroy(iter);
+					_alloc.construct(temp.getPtr(), T(*iter));
+					_alloc.destroy(iter.getPtr());
 				}
 				_alloc.deallocate(_vec, capacity());
-				_vec = ret;
+				_vec = ret.getPtr();
 				_capacity = new_cap;
 			}
 		}
@@ -288,23 +350,8 @@ namespace ft
 #endif
 
 
+
 /*
-vector();	// Default constructor. Constructs an empty container with a default-constructed allocator.
-
-explicit vector( const Allocator& alloc ); 
-	(until C++17) // Constructs an empty container with the given allocator alloc.
-
-
-explicit vector( size_type count, const T& value = T(), const Allocator& alloc = Allocator());
-	(until C++11) // Constructs the container with count copies of elements with value value
-
-template< class InputIt >
-vector( InputIt first, InputIt last,
-        const Allocator& alloc = Allocator() );
-	(until C++20) // Constructs the container with the contents of the range [first, last)
-
-vector( const vector& other );
-	(until C++20) // Copy constructor. Constructs the container with the copy of the contents of other. 
 
 • iterators_traits
 • reverse_iterator
