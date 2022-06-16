@@ -68,6 +68,8 @@
 		"typeinfo": "cpp",
 		"bit": "cpp",
 		"__functional_03": "cpp",
-		"filesystem": "cpp"
+		"filesystem": "cpp",
+		"map": "cpp",
+		"__tree": "cpp"
 	}
 }

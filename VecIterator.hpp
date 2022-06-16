@@ -18,8 +18,10 @@ namespace ft
 		typedef	value_type&						reference;
 		typedef	const value_type& 				const_reference;
 		typedef	T*								pointer;
-		// typedef	random_access_iterator_tag		iterator_category;
-		typedef	std::random_access_iterator_tag	iterator_category;
+		typedef	const T*						const_pointer;
+		typedef	random_access_iterator_tag		iterator_category;
+
+		//---------------------------------------------------------------------------//
 
 	public:
 		vecIterator(T* ptr = nullptr) 			{_ptr = ptr;}
@@ -90,5 +92,6 @@ namespace ft
 	template<typename T>
 	std::ostream& operator<<(std::ostream& out, vecIterator<T> iter) {out << iter.getConstPtr(); return out; }
 }
+
 
 #endif

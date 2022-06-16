@@ -18,18 +18,18 @@ namespace ft
 	{
 	public:
 		//------------------ Typedefs------------------------------------------//
-		typedef	T								value_type;
-		typedef	Allocator						allocator_type;
-		typedef	std::size_t						size_type;
-		typedef	std::ptrdiff_t					difference_type;
-		typedef	value_type&						reference;
-		typedef	const value_type& 				const_reference;
-		typedef	typename Allocator::pointer		pointer;
-		typedef	std::random_access_iterator_tag	iterator_category;
-		typedef	vecIterator<T>					iterator;
-		typedef	vecIterator<const T>			const_iterator;
-		typedef	vecReverseIterator<T>			reverse_iterator;
-		typedef	vecReverseIterator<const T>		const_reverse_iterator;
+		typedef	T									value_type;
+		typedef	Allocator							allocator_type;
+		typedef	std::size_t							size_type;
+		typedef	std::ptrdiff_t						difference_type;
+		typedef	value_type&							reference;
+		typedef	const value_type& 					const_reference;
+		typedef	typename Allocator::pointer			pointer;
+		typedef	typename Allocator::const_pointer	const_pointer;
+		typedef	vecIterator<T>						iterator;
+		typedef	vecIterator<const T>				const_iterator;
+		typedef	vecReverseIterator<T>				reverse_iterator;
+		typedef	vecReverseIterator<const T>			const_reverse_iterator;
 
 		//------------------ Iterator Member Functions ------------------------//
 	public:
@@ -145,7 +145,7 @@ namespace ft
 		const_reference							back() const { return *(cbegin() - 1); }
 		T*										data(){ return begin().getPtr(); }
 		const T*								data() const { return cbegin().getConstPtr(); }
-		bool									empty() const { return size() ? false : true; }
+		bool									empty() const { return size() == 0; }
 		size_type								max_size() const { return std::min<size_type>(_alloc.max_size(), 
 																			std::numeric_limits<difference_type>::max());}
 		void									clear(){
@@ -269,14 +269,12 @@ namespace ft
 		Allocator								get_allocator() const { return _alloc; }
 		size_type								size() const { return _size; }
 		size_type								capacity() const { return _capacity; }
-
 	
-	private:
+	protected:
+		size_type		_size;
+		size_type		_capacity;
 		T*				_vec;
 		Allocator		_alloc;
-		size_type		_capacity;
-		size_type		_size;
-
 	};
 
 	template< class T, class Alloc >
