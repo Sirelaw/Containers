@@ -10,11 +10,6 @@ namespace ft
 	template <typename T>
 	class Node
 	{
-		enum{
-			LEFT,
-			RIGHT
-		};
-
 	public:
 		Node(T value = T(), Node* parent = nullptr, Node* right_child = nullptr, Node* left_child = nullptr)
 			: _parent(parent), _right_child(right_child), _left_child(left_child), _value(value), _color(true) {}
@@ -32,25 +27,10 @@ namespace ft
 			return *this;
 		}
 
-		void	reset_pointers(){
-			_parent = nullptr;
-			_right_child = nullptr;
-			_left_child = nullptr;
-		}
-
-
-		Node&	search(T value)
+		Node&	replace_value(Node& other)
 		{
-			Node*	node = this;
-
-			while (node != nullptr && node->value() != value)
-			{
-				if (value < node->value())
-					node = node->left_child();
-				else
-					node = node->right_child();
-			}
-			return *node;
+			set_value(other.value());
+			return other;
 		}
 
 		Node&	in_order_predecessor()
@@ -122,18 +102,93 @@ namespace ft
 			return count;
 		}
 
-		bool is_leaf() const { return !right_child() && !left_child(); }
-
+		bool 	is_leaf() const { return !right_child() && !left_child(); }
+		bool	is_red() const {return _color; }
+		bool	is_black() const {return !_color; }
+		int		count_children() const { return ((bool) right_child() + (bool) left_child()); }
 		Node*	parent() const { return _parent; }
 		Node*	right_child() const { return _right_child; }
 		Node*	left_child() const { return _left_child; }
 		T		value() const { return _value; }
 		bool	color() const { return _color; }
+		bool	color(Node* ptr) const { if(ptr) return ptr->_color; return false; }
 		void	set_parent(Node* ptr) { _parent = ptr; }
 		void	set_right_child(Node* ptr) { _right_child = ptr; }
 		void	set_left_child(Node* ptr) { _left_child = ptr; }
 		void	set_value(T value) { _value = value; }
 		void	set_color(bool color) { _color = color; }
+		bool	is_right() const { return !is_left(); }
+		bool	is_left() const
+		{
+			if (_parent->left_child() == this)
+				return true;
+			return false;
+		}
+
+		Node*	close_nephew()
+		{
+			Node*	sib = sibling();
+			if (sib)
+			{
+				if (is_left())
+					return sib->left_child();
+				return sib->right_child();
+			}
+			return nullptr;
+		}
+
+		Node*	distant_nephew()
+		{
+			Node*	sib = sibling();
+			if (sib)
+			{
+				if (is_left())
+					return sib->right_child();
+				return sib->left_child();
+			}
+			return nullptr;
+		}
+
+		bool	close_nephew_color() const { return color(close_nephew()); }
+		bool	distant_nephew_color() const { return color(distant_nephew()); }
+
+		Node*	sibling() const
+		{
+			if (is_left())
+				return parent()->right_child();
+			return parent()->left_child();
+		}
+		
+		Node*	uncle() const 
+		{ 
+			if (parent()->is_left()) 
+				return _parent->parent()->right_child(); 
+			return _parent->parent()->left_child();
+		}
+
+		Node**	parent_branch()
+		{
+			if (is_left())
+				return &(_parent->_left_child);
+			return &(_parent->_right_child);
+		}
+
+		bool	parent_is_black() const { return !(parent()->color()); }
+		bool	parent_is_red() const { return (parent()->color()); }
+		bool	uncle_is_black() const { return !uncle_is_red(); }
+		bool	uncle_is_red() const
+		{
+			if (uncle())
+				return uncle()->color();
+			return false;
+		}
+
+		Node&	single_child()
+		{
+			if (left_child())
+				return *(left_child());
+			return *(right_child());
+		}
 
 		void	right_rotate()
 		{
@@ -144,6 +199,8 @@ namespace ft
 			_left_child->_right_child = this;
 			this->_parent = this->left_child();
 			this->_left_child = temp;
+			if (temp)
+				temp->_parent = this;
 		}
 		
 		void	left_rotate()
@@ -155,36 +212,9 @@ namespace ft
 			_right_child->_left_child = this;
 			this->_parent = this->right_child();
 			this->_right_child = temp;
+			if (temp)
+				temp->_parent = this;
 		}
-
-		bool	is_left()
-		{
-			if (_parent->left_child() == this)
-				return true;
-			return false;
-		}
-
-		bool	parent_is_black() { return !(parent()->color()); }
-		bool	parent_is_red() { return (parent()->color()); }
-
-		bool	uncle_is_red()
-		{
-			if (uncle())
-				return uncle()->color();
-			return false;
-		}
-
-		bool	uncle_is_black() { return !uncle_is_red(); }
-
-		Node*	uncle()
-		{
-			if (is_left())
-				return _parent->right_child();
-			return _parent->left_child();
-		}
-
-		void	balance_node()
-		{}
 
 		int	balance_factor() const
 		{
@@ -195,15 +225,6 @@ namespace ft
 			if (right_child())
 				diff -= _right_child->size();
 			return diff;
-		}
-
-		int		count_children() const { return ((bool) right_child() + (bool) left_child()); }
-
-		Node**	parent_branch()
-		{
-			if (is_left())
-				return &(_parent->_left_child);
-			return &(_parent->_right_child);
 		}
 
 	protected:

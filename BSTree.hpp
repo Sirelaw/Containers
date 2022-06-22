@@ -11,6 +11,13 @@
 
 namespace ft
 {
+	enum{
+		LL,
+		LR,
+		RL,
+		RR
+	};
+
 	template <typename T>
 	class BSTree : public Node<T>
 	{
@@ -72,12 +79,11 @@ namespace ft
 
 		void	level_order_transverse() 
 		{
-
-			if (!root())
-				return;
 			vector<Node<T>*>	ptr_vec;
 			int					i = 0;
 
+			if (!root())
+				return;
 			ptr_vec.push_back(root());
 			while (ptr_vec.size() > i)
 			{
@@ -93,7 +99,7 @@ namespace ft
 		Node<T>*	root() const { return this->left_child(); }
 		void		set_root(Node<T>* ptr) { this->set_left_child(ptr); }
 
-		void	print_tree() const
+		void	print_tree_in_order() const
 		{
 			stack<const Node<T>*>	temp;
 			const Node<T>*			current = root();
@@ -107,12 +113,48 @@ namespace ft
 				}
 				while (!(temp.empty()) && !current)
 				{
-					std::cout << " ->" << temp.top()->value() << " bf: " << temp.top()->balance_factor();
+					// std::cout << " ->" << temp.top()->value() << " bf: " << temp.top()->balance_factor();
+					std::cout << " ->" << temp.top()->value() << "\t(" << temp.top()->color() << ", " 
+						<< temp.top()->balance_factor() << ", " << temp.top()->parent()->value() << ")" << std::endl;
 					current = temp.top()->right_child();
 					temp.pop();
 				}
 			}
-			std::cout << std::endl;
+		}
+
+		void	print_tree_by_level() const
+		{
+			vector<Node<T>*>	ptr_vec;
+			int					i = 0;
+
+			if (!root())
+				return;
+			ptr_vec.push_back(root());
+			while (ptr_vec.size() > i)
+			{
+				std::cout << " ->" << ptr_vec[i]->value() << "\t(" << ptr_vec[i]->color() << ", " << ptr_vec[i]->balance_factor() << ", " 
+							<< ptr_vec[i]->parent()->value() << ")" << std::endl;
+				if (ptr_vec[i]->left_child())
+					ptr_vec.push_back(ptr_vec[i]->left_child());
+				if ((ptr_vec[i]->right_child()))
+					ptr_vec.push_back(ptr_vec[i]->right_child());
+				
+				i++;
+			}
+		}
+
+		Node<T>*	search(T value)
+		{
+			Node<T>*	node = root();
+
+			while (node != nullptr && node->value() != value)
+			{
+				if (value < node->value())
+					node = node->left_child();
+				else
+					node = node->right_child();
+			}
+			return node;
 		}
 
 		virtual Node<T>&	insert(T val)
@@ -165,8 +207,7 @@ namespace ft
 			return node.balance_factor();
 		}
 
-
-		void	delete_single_node(Node<T>& node)
+		virtual void	delete_single_node(Node<T>& node)
 		{
 			int			offspring	= node.count_children();
 			Node<T>*	temp_ptr	= &node;
@@ -176,12 +217,9 @@ namespace ft
 				delete &node;
 			}
 			else if (offspring == 1){
-				temp_ptr = *(node.parent_branch());
-				if (node.left_child())
-					*(node.parent_branch()) = node.left_child();
-				else
-					*(node.parent_branch()) = node.right_child();
-				delete temp_ptr;
+				node.single_child().set_parent(node.parent());
+				*(node.parent_branch()) = &(node.single_child());
+				delete &node;
 			}
 			else {
 				temp_ptr = &(node.in_order_successor());
@@ -190,19 +228,19 @@ namespace ft
 			}
 		}
 
-		void	delete_node_and_children(Node<T>& node)
+		virtual void	delete_node_and_children(Node<T>& node)
 		{
 			delete_children(node);
 			delete_node(node);
 		}
 
-		void	delete_node(Node<T>& node)
+		virtual void	delete_node(Node<T>& node)
 		{
 			delete_single_node(node);
 			_size--;
 		}
 
-		void	delete_children(Node<T>& node)
+		virtual void	delete_children(Node<T>& node)
 		{
 			stack<Node<T>*>		temp;
 			Node<T>*			current = &node;
@@ -227,16 +265,14 @@ namespace ft
 			_size = root()->size();
 		}
 
-		void	test_node()
+		virtual void	remove(T value)
 		{
-			// (root()->search(23)).left_rotate();
-			// (root()->search(25)).right_rotate();
-			// (root()->search(18)).right_rotate();
-			// delete_node(root()->search(23));
-			// print_tree();
-			// level_order_transverse();
-		}
+			Node<T>*	temp = search(value);
 
+			PRINT("IN BST", RED);
+			if (temp)
+				delete_node(*temp);
+		}
 
 		Node<T>&	predecessor(Node<T>& node)
 		{
@@ -270,9 +306,78 @@ namespace ft
 			return *min;
 		}
 
+		int		determine_setup(Node<T>& node)
+		{
+			if (node.parent()->is_left() && node.is_left())
+				return LL;
+			else if (node.parent()->is_left() && node.is_right())
+				return LR;
+			else if (node.parent()->is_right() && node.is_left())
+				return RL;
+			return RR;
+		}
+
+		void	test_node()
+		{
+			remove(79);
+			remove(18);
+			remove(62);
+			remove(10);
+			remove(4);
+			remove(42);
+			remove(78);
+			remove(28);
+			remove(35);/////////
+			remove(81);
+			remove(99);
+			remove(74);
+			remove(47);
+			remove(5);
+			remove(80);
+			remove(93);
+			remove(65);
+			remove(33);
+			remove(69);
+			remove(37);
+			remove(71);
+			remove(36);
+			remove(20);
+			remove(95);
+			remove(48);
+			remove(21);
+			remove(63);
+			remove(73);
+			remove(3);
+			remove(16);
+			remove(7);
+			remove(9);
+			remove(94);////
+			remove(55);
+			remove(14);
+			remove(6);
+			remove(61);
+			remove(27);/////
+			remove(89);
+			remove(49);
+			remove(66);
+			remove(82);
+			PRINT("<<<<<--------->>>>>>", GREEN);
+			print_tree_by_level();
+			// remove(26);
+			// remove(70);///
+			// remove(68);
+			// remove(58);
+			// remove(2);
+			// remove(44);
+			// remove(88);
+			// remove(85);
+			// print_tree_in_order();
+			// level_order_transverse();
+		}
+
 		size_t	size() const { return _size; }
 
-	private:
+	protected:
 		size_t						_size;
 		std::allocator< Node<T> >	_node_alloc;
 	};
