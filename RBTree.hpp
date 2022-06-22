@@ -26,7 +26,7 @@ namespace ft
 		void	rotate_to_balance(Node<T>& node)
 		{
 			Node<T>**	grand_parent_position;
-			int			setup = 0;
+			int			setup;
 
 			grand_parent_position = node.parent()->parent()->parent_branch();	
 			setup = this->determine_setup(node);
@@ -88,7 +88,6 @@ namespace ft
 		{
 			Node<T>*	temp = this->search(value);
 
-			PRINT("IN RBT", RED);
 			if (temp){
 				delete_single_node(*temp);
 				this->_size--;
@@ -110,28 +109,30 @@ namespace ft
 			}
 		}
 
+/*
+	case 1 & 2: node is red || node is root
+	case 3: 	S,D,C are all black
+	case 4:		S is red
+	case 5:		S,D are black. C is red
+	case 6:		D is red
+*/
+
 		void	resolve_double_black(Node<T>& node)
 		{
 			bool	temp = node.parent()->color();
 
 			switch (double_black_case_type(node))
 			{
-				case 1: // node is red
-					PRINT("Case 1", RED);
+				case 1:
 					break ;
-				case 2: // node is root
-					PRINT("Case 2", RED);
-					break;
-				case 3: // S,D,C are all black
-					PRINT("Case 3", RED);
+				case 3:
 					node.sibling()->set_color(red);
 					if(node.parent_is_red())
 						node.parent()->set_color(black);
 					else
 						resolve_double_black(*(node.parent()));
 					break;
-				case 4: // S is red
-					PRINT("Case 4", RED);
+				case 4:
 					node.sibling()->set_color(black);
 					node.parent()->set_color(red);
 					if (node.is_left())
@@ -140,26 +141,21 @@ namespace ft
 						node.parent()->right_rotate();
 					resolve_double_black(node);
 					break;
-				case 5: // S,D are black. C is red
-					PRINT("Case 5", RED);
+				case 5:
 					node.sibling()->set_color(red);
 					node.close_nephew()->set_color(black);
 					if (node.is_left())
 						node.sibling()->right_rotate();
 					else
 						node.sibling()->left_rotate();
-				case 6: // D is red
-					PRINT("Case 6", RED);
+				case 6:
 					node.parent()->set_color(node.sibling()->color());
 					node.sibling()->set_color(temp);
 					node.distant_nephew()->set_color(black);
 					if (node.is_left())
 						node.parent()->left_rotate();
 					else
-						node.parent()->right_rotate();			
-					break;
-				default:
-					PRINT("Delete case not handled.", RED);
+						node.parent()->right_rotate();
 			}
 		}
 
@@ -170,10 +166,8 @@ namespace ft
 			Node<T>*	close_neph = node.close_nephew();
 			Node<T>*	distant_neph = node.distant_nephew();
 
-			if (node.is_red())
+			if (node.is_red() || (&node == this->root()))
 				return 1;
-			else if (&node == this->root())
-				return 2;
 			else if (sib->is_black() && !node.color(close_neph) && !node.color(distant_neph))
 				return 3;
 			else if (sib->is_red())
