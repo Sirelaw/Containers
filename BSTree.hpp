@@ -6,6 +6,7 @@
 #include "Stack.hpp"
 #include "Vector.hpp"
 #include "Node.hpp"
+#include "utils.hpp"
 
 #define node_PARENT_BRANCH *(node.parent_branch())
 
@@ -18,8 +19,8 @@ namespace ft
 		RR
 	};
 
-	template <typename T>
-	class BSTree : public Node<T>
+	template <class T, class Compare = less<T> , class _Allocator = std::allocator<T> >
+	class BSTree
 	{
 	public:
 		BSTree() : _size(0) { }
@@ -30,16 +31,16 @@ namespace ft
 				delete_node_and_children(*root());
 		}
 
-		BSTree& operator=(const Node<T>& to_assign)
+		BSTree& operator=(const Node<T>& node)
 		{
-			if (root() != &to_assign)
+			if (root() != &node)
 			{
 				vector<const Node<T>*>	ptr_vec;
 				int						i = 0;
 
 				if (root())
 					delete_node_and_children(*root());
-				ptr_vec.push_back(&to_assign);
+				ptr_vec.push_back(&node);
 				while (ptr_vec.size() > i)
 				{
 					if (ptr_vec[i]->left_child())
@@ -53,16 +54,16 @@ namespace ft
 			return *this;
 		}
 
-		BSTree& operator=(const BSTree& to_assign)
+		BSTree& operator=(const BSTree& tree)
 		{
-			if ((this != &to_assign) && to_assign.root())
+			if ((this != &tree) && tree.root())
 			{
 				vector<const Node<T>*>	ptr_vec;
 				int						i = 0;
 
 				if (root())
 					delete_node_and_children(*root());
-				ptr_vec.push_back(to_assign.root());
+				ptr_vec.push_back(tree.root());
 				while (ptr_vec.size() > i)
 				{
 					if (ptr_vec[i]->left_child())
@@ -96,8 +97,8 @@ namespace ft
 		}
 
 
-		Node<T>*	root() const { return this->left_child(); }
-		void		set_root(Node<T>* ptr) { this->set_left_child(ptr); }
+		Node<T>*	root() const { return _root_parent.left_child(); }
+		void		set_root(Node<T>* ptr) { _root_parent.set_left_child(ptr); }
 
 		void	print_tree_in_order() const
 		{
@@ -163,9 +164,9 @@ namespace ft
 			if (_size == 1)
 			{
 				set_root(new Node<T>(val));
-				root()->set_parent(this);
+				root()->set_parent(&_root_parent);
 				root()->set_color(false);
-				this->set_color(false);
+				_root_parent.set_color(false);
 				return *root();
 			}
 			return (insert(*root(), val));
@@ -178,9 +179,11 @@ namespace ft
 
 			while (temp)
 			{
-				if (val > temp->value()){
+				if (Compare()(temp->value(), val)){
 					if (temp->right_child())
 						temp = temp->right_child();//
+					else if (Compare()(temp->value(), val) == Compare()(val, temp->value()))
+						break;
 					else{
 						temp->set_right_child(new Node<T>(val));
 						temp->right_child()->set_parent(temp);
@@ -191,6 +194,8 @@ namespace ft
 				else{
 					if (temp->left_child())
 						temp = temp->left_child();//
+					else if (Compare()(temp->value(), val) == Compare()(val, temp->value()))
+						break;
 					else{
 						temp->set_left_child(new Node<T>(val));
 						temp->left_child()->set_parent(temp);
@@ -269,7 +274,6 @@ namespace ft
 		{
 			Node<T>*	temp = search(value);
 
-			PRINT("IN BST", RED);
 			if (temp)
 				delete_node(*temp);
 		}
@@ -378,6 +382,7 @@ namespace ft
 		size_t	size() const { return _size; }
 
 	protected:
+		Node<T>						_root_parent;
 		size_t						_size;
 		std::allocator< Node<T> >	_node_alloc;
 	};

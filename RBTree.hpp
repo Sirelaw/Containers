@@ -11,16 +11,16 @@ namespace ft
 		black,
 		red
 	};
-	
-	template <typename T>
-	class RBTree : public BSTree<T>
+
+	template <class T, class less, class Allocator >
+	class RBTree : public BSTree<T, less, Allocator >
 	{
 	private:
 		
 	public:
-		RBTree() : BSTree<T>(){}
-		RBTree(const Node<T>& node) : BSTree<T>(node){}
-		RBTree(const RBTree& to_copy) : BSTree<T>(to_copy) {} // needs to be implemented
+		RBTree() : BSTree<T, less, Allocator>(){}
+		RBTree(const Node<T>& node) : BSTree<T, less, Allocator>(node){}
+		RBTree(const RBTree& to_copy) : BSTree<T, less, Allocator>(to_copy) {} // needs to be implemented
 		~RBTree(){}
 
 		void	rotate_to_balance(Node<T>& node)
@@ -49,7 +49,7 @@ namespace ft
 
 		virtual Node<T>&	insert(T val)
 		{
-			Node<T>&	inserted = BSTree<T>::insert(val);
+			Node<T>&	inserted = BSTree<T, less, Allocator>::insert(val);
 			Node<T>*	temp = &inserted;
 			int			setup = 0;
 				int	i = 0;

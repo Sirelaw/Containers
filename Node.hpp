@@ -227,7 +227,7 @@ namespace ft
 			return diff;
 		}
 
-	protected:
+	private:
 		Node*					_parent;
 		Node*					_right_child;
 		Node*					_left_child;

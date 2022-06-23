@@ -8,8 +8,9 @@
 #include "verbose.hpp"
 #include "Node.hpp"
 #include "BSTree.hpp"
-// #include "AVLTree.hpp"
 #include "RBTree.hpp"
+#include "Pair.hpp"
+#include "Map.hpp"
 
 // template<class Os, class Co> Os& operator<<(Os& os, const Co& co) {
 //     os << "{";
@@ -24,8 +25,10 @@ void	check()
 
 int main()
 {
-	ft::RBTree<int>	temp;
+	ft::RBTree<int, ft::less<int>, std::allocator<int> >	temp;
+	std::map<int, int, ft::less<int> > test_map;
 	// ft::BSTree<int>	temp;
+
 	// ft::Node<int>	test;
 
 	// temp.insert(23);
