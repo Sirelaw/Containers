@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <string>
+#include "Pair.hpp"
 #include "RBTree.hpp"
 
 namespace ft

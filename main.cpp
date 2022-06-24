@@ -120,6 +120,6 @@ int main()
 	PRINT(temp.size(), GREEN);
 	
 
-	// atexit(check);
+	atexit(check);
 	return (0);
 }

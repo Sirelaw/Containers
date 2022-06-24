@@ -14,7 +14,7 @@ namespace ft
 		Node(T value = T(), Node* parent = nullptr, Node* right_child = nullptr, Node* left_child = nullptr)
 			: _parent(parent), _right_child(right_child), _left_child(left_child), _value(value), _color(true) {}
 		Node(const Node& to_copy) { *this = to_copy; }
-		~Node() {}
+		~Node() { _value.~T(); }
 
 		Node& operator=(const Node& to_assign) { 
 			if (this != &to_assign){
@@ -226,6 +226,8 @@ namespace ft
 				diff -= _right_child->size();
 			return diff;
 		}
+
+		T&	value_pointer() { return _value; }
 
 	private:
 		Node*					_parent;

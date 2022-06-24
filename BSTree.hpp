@@ -12,17 +12,12 @@
 
 namespace ft
 {
-	enum{
-		LL,
-		LR,
-		RL,
-		RR
-	};
-
-	template <class T, class Compare = less<T> , class _Allocator = std::allocator<T> >
+	template <class T, class Compare = less<T> , class Allocator = std::allocator<T> >
 	class BSTree
 	{
 	public:
+		typedef typename Allocator::template rebind< Node<T> >::other	node_allocator;
+
 		BSTree() : _size(0) { }
 		BSTree(const Node<T>& node) {*this = node; _size = node.size(); }
 		BSTree(const BSTree& to_copy) { *this = to_copy;  _size = to_copy.size(); }
@@ -163,7 +158,8 @@ namespace ft
 			_size++;
 			if (_size == 1)
 			{
-				set_root(new Node<T>(val));
+				set_root(_node_alloc.allocate(1));
+				_node_alloc.construct(root(), Node<T>(val));
 				root()->set_parent(&_root_parent);
 				root()->set_color(false);
 				_root_parent.set_color(false);
@@ -185,7 +181,8 @@ namespace ft
 					else if (Compare()(temp->value(), val) == Compare()(val, temp->value()))
 						break;
 					else{
-						temp->set_right_child(new Node<T>(val));
+						temp->set_right_child(_node_alloc.allocate(1));
+						_node_alloc.construct(temp->right_child(), Node<T>(val));
 						temp->right_child()->set_parent(temp);
 						temp = temp->right_child();//
 						break;
@@ -197,7 +194,8 @@ namespace ft
 					else if (Compare()(temp->value(), val) == Compare()(val, temp->value()))
 						break;
 					else{
-						temp->set_left_child(new Node<T>(val));
+						temp->set_left_child(_node_alloc.allocate(1));
+						_node_alloc.construct(temp->left_child(), Node<T>(val));
 						temp->left_child()->set_parent(temp);
 						temp = temp->left_child();//
 						break;
@@ -219,12 +217,14 @@ namespace ft
 
 			if (offspring == 0){
 				*(node.parent_branch()) = nullptr;
-				delete &node;
+				_node_alloc.destroy(&node);
+				_node_alloc.deallocate(temp_ptr, 1);
 			}
 			else if (offspring == 1){
 				node.single_child().set_parent(node.parent());
 				*(node.parent_branch()) = &(node.single_child());
-				delete &node;
+				_node_alloc.destroy(&node);
+				_node_alloc.deallocate(temp_ptr, 1);
 			}
 			else {
 				temp_ptr = &(node.in_order_successor());
@@ -261,7 +261,10 @@ namespace ft
 				{
 					current = temp.top()->right_child();
 					if (temp.top() != &node)
-						delete temp.top();
+					{
+						_node_alloc.destroy(temp.top());
+						_node_alloc.deallocate(temp.top(), 1);
+					}
 					temp.pop();
 				}
 			}
@@ -310,61 +313,50 @@ namespace ft
 			return *min;
 		}
 
-		int		determine_setup(Node<T>& node)
-		{
-			if (node.parent()->is_left() && node.is_left())
-				return LL;
-			else if (node.parent()->is_left() && node.is_right())
-				return LR;
-			else if (node.parent()->is_right() && node.is_left())
-				return RL;
-			return RR;
-		}
-
 		void	test_node()
 		{
-			remove(79);
-			remove(18);
-			remove(62);
-			remove(10);
-			remove(4);
-			remove(42);
-			remove(78);
-			remove(28);
-			remove(35);/////////
-			remove(81);
-			remove(99);
-			remove(74);
-			remove(47);
-			remove(5);
-			remove(80);
-			remove(93);
-			remove(65);
-			remove(33);
-			remove(69);
-			remove(37);
-			remove(71);
-			remove(36);
-			remove(20);
-			remove(95);
-			remove(48);
-			remove(21);
-			remove(63);
-			remove(73);
-			remove(3);
+			// remove(79);
+			// remove(18);
+			// remove(62);
+			// remove(10);
+			// remove(4);
+			// remove(42);
+			// remove(78);
+			// remove(28);
+			// remove(35);/////////
+			// remove(81);
+			// remove(99);
+			// remove(74);
+			// remove(47);
+			// remove(5);
+			// remove(80);
+			// remove(93);
+			// remove(65);
+			// remove(33);
+			// remove(69);
+			// remove(37);
+			// remove(71);
+			// remove(36);
+			// remove(20);
+			// remove(95);
+			// remove(48);
+			// remove(21);
+			// remove(63);
+			// remove(73);
+			// remove(3);
 			remove(16);
-			remove(7);
-			remove(9);
-			remove(94);////
-			remove(55);
-			remove(14);
-			remove(6);
-			remove(61);
-			remove(27);/////
-			remove(89);
-			remove(49);
-			remove(66);
-			remove(82);
+			// remove(7);
+			// remove(9);
+			// remove(94);////
+			// remove(55);
+			// remove(14);
+			// remove(6);
+			// remove(61);
+			// remove(27);/////
+			// remove(89);
+			// remove(49);
+			// remove(66);
+			// remove(82);
 			PRINT("<<<<<--------->>>>>>", GREEN);
 			print_tree_by_level();
 			// remove(26);
@@ -384,7 +376,7 @@ namespace ft
 	protected:
 		Node<T>						_root_parent;
 		size_t						_size;
-		std::allocator< Node<T> >	_node_alloc;
+		node_allocator				_node_alloc;
 	};
 }
 

@@ -12,6 +12,13 @@ namespace ft
 		red
 	};
 
+	enum{
+		LL,
+		LR,
+		RL,
+		RR
+	};
+
 	template <class T, class less, class Allocator >
 	class RBTree : public BSTree<T, less, Allocator >
 	{
@@ -22,6 +29,49 @@ namespace ft
 		RBTree(const Node<T>& node) : BSTree<T, less, Allocator>(node){}
 		RBTree(const RBTree& to_copy) : BSTree<T, less, Allocator>(to_copy) {} // needs to be implemented
 		~RBTree(){}
+
+		int		determine_setup(Node<T>& node)
+		{
+			if (node.parent()->is_left() && node.is_left())
+				return LL;
+			else if (node.parent()->is_left() && node.is_right())
+				return LR;
+			else if (node.parent()->is_right() && node.is_left())
+				return RL;
+			return RR;
+		}
+
+		Node<T>&	predecessor(Node<T>& node)
+		{
+			Node<T>*	max;
+
+			max = &node;
+			if (max->left_child())
+				max = node.left_child();
+			else
+				return node;
+			while (max->right_child())
+				max = max->right_child();
+			return *max;
+		}
+
+		Node<T>&	successor(Node<T>& node)
+		{
+			Node<T>*	min;
+
+			min = &node;
+			if (min->right_child())
+				min = node.right_child();
+			else{
+				while(min->parent()->value() < node.value())
+					min = min->parent();
+				min = min->parent();
+				return *min;
+			}
+			while (min->left_child())
+				min = min->left_child();
+			return *min;
+		}
 
 		void	rotate_to_balance(Node<T>& node)
 		{
@@ -47,14 +97,66 @@ namespace ft
 			(*grand_parent_position)->left_child()->set_color(red);
 		}
 
+		virtual Node<T>&	new_insert(T val)
+		{
+			_size++;
+			if (_size == 1)
+			{
+				set_root(_node_alloc.allocate(1));
+				_node_alloc.construct(root(), Node<T>(val));
+				root()->set_parent(&_root_parent);
+				root()->set_color(false);
+				_root_parent.set_color(false);
+				return *root();
+			}
+			return (insert(*root(), val));
+		}
+
+		Node<T>&	insert(Node<T>& node, T val)
+		{
+			Node<T>*			temp;
+			temp = &node;
+
+			while (temp)
+			{
+				if (Compare()(temp->value(), val)){
+					if (temp->right_child())
+						temp = temp->right_child();//
+					else if (Compare()(temp->value(), val) == Compare()(val, temp->value()))
+						break;
+					else{
+						temp->set_right_child(_node_alloc.allocate(1));
+						_node_alloc.construct(temp->right_child(), Node<T>(val));
+						temp->right_child()->set_parent(temp);
+						temp = temp->right_child();//
+						break;
+					}
+				}
+				else{
+					if (temp->left_child())
+						temp = temp->left_child();//
+					else if (Compare()(temp->value(), val) == Compare()(val, temp->value()))
+						break;
+					else{
+						temp->set_left_child(_node_alloc.allocate(1));
+						_node_alloc.construct(temp->left_child(), Node<T>(val));
+						temp->left_child()->set_parent(temp);
+						temp = temp->left_child();//
+						break;
+					}
+				}
+			}
+			return *temp;
+		}
+
 		virtual Node<T>&	insert(T val)
 		{
-			Node<T>&	inserted = BSTree<T, less, Allocator>::insert(val);
+			Node<T>&	inserted = new_insert(val);
 			Node<T>*	temp = &inserted;
 			int			setup = 0;
 				int	i = 0;
 
-			if (inserted.parent_is_black()) // If parent is black
+			if (inserted.parent_is_black())
 				return inserted;
 			else if (inserted.uncle_is_black())
 			{
@@ -84,6 +186,12 @@ namespace ft
 			return inserted;
 		}
 
+		void	remove(Node<T>& node)
+		{
+			delete_single_node(node);
+			this->_size--;
+		}
+
 		virtual void	remove(T value)
 		{
 			Node<T>*	temp = this->search(value);
@@ -97,6 +205,7 @@ namespace ft
 		virtual void	delete_single_node(Node<T>& node)
 		{
 			int			offspring	= node.count_children();
+			Node<T>*	temp = &node;
 
 			if (offspring == 1)
 				delete_single_node(node.replace_value(node.single_child()));
@@ -105,7 +214,8 @@ namespace ft
 			else{
 				resolve_double_black(node);
 				*(node.parent_branch()) = nullptr;
-				delete &node;
+				this->_node_alloc.destroy(temp);
+				this->_node_alloc.deallocate(temp, 1);
 			}
 		}
 
@@ -178,7 +288,48 @@ namespace ft
 				return 6;
 			return 0;
 		}
+
+		void	delete_node_and_children(Node<T>& node)
+		{
+			delete_children(node);
+			remove(node);
+		}
+
+		void	delete_children(Node<T>& node)
+		{
+			stack<Node<T>*>		temp;
+			Node<T>*			current = &node;
+
+			while (current || !(temp.empty()))
+			{
+				while (current)
+				{
+					temp.push(current);
+					current = current->left_child();
+				}
+				while (!(temp.empty()) && !current)
+				{
+					current = temp.top()->right_child();
+					if (temp.top() != &node)
+						remove(*(temp.top()));
+					temp.pop();
+				}
+			}
+		}
+
+		int	balance_factor(Node<T>& node)
+		{
+			return node.balance_factor();
+		}
+
+		size_t	size() const { return _size; }
+
+	protected:
+		Node<T>						_root_parent;
+		size_t						_size;
+		node_allocator				_node_alloc;
 	};
+
 }
 
 /*
