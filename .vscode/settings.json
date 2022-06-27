@@ -70,6 +70,8 @@
 		"__functional_03": "cpp",
 		"filesystem": "cpp",
 		"map": "cpp",
-		"__tree": "cpp"
+		"__tree": "cpp",
+		"__functional_base_03": "cpp",
+		"__memory": "cpp"
 	}
 }

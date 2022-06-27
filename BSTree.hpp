@@ -19,8 +19,8 @@ namespace ft
 		typedef typename Allocator::template rebind< Node<T> >::other	node_allocator;
 
 		BSTree() : _size(0) { }
-		BSTree(const Node<T>& node) {*this = node; _size = node.size(); }
-		BSTree(const BSTree& to_copy) { *this = to_copy;  _size = to_copy.size(); }
+		BSTree(const Node<T>& node) : _size(node.size()) { *this = node; }
+		BSTree(const BSTree& to_copy) : _size(to_copy.size()) { *this = to_copy; }
 		virtual ~BSTree() {
 			if (root())
 				delete_node_and_children(*root());

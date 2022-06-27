@@ -2,7 +2,7 @@ NAME = containers
 
 CC = c++
 
-FLAGS = -std=c++98 #-Wall -Wextra -Werror 
+FLAGS = -std=c++98 -Wall -Wextra #-g3 #-Werror 
 
 SRC_DIR = ./
 OBJ_DIR = ./obj/

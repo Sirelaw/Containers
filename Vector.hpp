@@ -271,8 +271,8 @@ namespace ft
 		size_type								capacity() const { return _capacity; }
 	
 	protected:
-		size_type		_size;
 		size_type		_capacity;
+		size_type		_size;
 		T*				_vec;
 		Allocator		_alloc;
 	};

@@ -19,7 +19,7 @@ namespace ft
 		typedef	const value_type& 				const_reference;
 		typedef	T*								pointer;
 		typedef	const T*						const_pointer;
-		typedef	random_access_iterator_tag		iterator_category;
+		typedef	bidirectional_iterator_tag						iterator_category;
 
 		//---------------------------------------------------------------------------//
 

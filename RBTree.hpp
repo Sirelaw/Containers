@@ -3,7 +3,11 @@
 
 #include <iostream>
 #include <string>
-#include "BSTree.hpp"
+#include "Stack.hpp"
+#include "Vector.hpp"
+#include "Node.hpp"
+#include "utils.hpp"
+#include "TreeIterator.hpp"
 
 namespace ft
 {
@@ -19,16 +23,379 @@ namespace ft
 		RR
 	};
 
-	template <class T, class less, class Allocator >
-	class RBTree : public BSTree<T, less, Allocator >
-	{
-	private:
-		
+	template <class T, class Compare = less<T> , class Allocator = std::allocator<T> >
+	class RBTree
+	{	
 	public:
-		RBTree() : BSTree<T, less, Allocator>(){}
-		RBTree(const Node<T>& node) : BSTree<T, less, Allocator>(node){}
-		RBTree(const RBTree& to_copy) : BSTree<T, less, Allocator>(to_copy) {} // needs to be implemented
-		~RBTree(){}
+		typedef T														value_type;
+		typedef Compare													value_compare;
+		typedef Allocator												allocator_type;
+	private:
+		typedef std::allocator_traits<allocator_type>					alloc_traits;
+		typedef Node<T>													NodeType;
+
+
+	public:
+		typedef typename Allocator::template rebind< Node<T> >::other	node_allocator;
+		typedef Node<T>													node_type;
+		typedef node_type*												node_ptr;
+		typedef node_ptr												node_pointer;
+		typedef typename alloc_traits::pointer         					pointer;
+    	typedef typename alloc_traits::const_pointer  					const_pointer;
+    	typedef typename alloc_traits::size_type       					size_type;
+    	typedef typename alloc_traits::difference_type					difference_type;
+
+//////////-------------------------- ITERATORS ----------------------////////////////////
+	
+	public:
+		typedef	bidirectional_iterator_tag								iterator_category;
+		typedef	treeIterator<T>											iterator;
+		typedef	treeIterator<const T>									const_iterator;
+		typedef	treeReverseIterator<T>									reverse_iterator;
+		typedef	treeReverseIterator<const T>							const_reverse_iterator;
+		typedef	const value_type& 										const_reference;
+		typedef value_type&												reference;
+
+	// node_pointer	end() { return &_root_parent; };
+	// node_pointer	rend() { return prev_node(end()); };
+	// node_pointer	begin() { return _begin_ptr; }
+	// node_pointer	rbegin() { return &_root_parent; }
+public:
+	iterator								begin(){ return iterator(_begin_ptr); }
+	iterator								end(){ return iterator(&_root_parent); }
+	const_iterator							cbegin() const { return const_iterator(_begin_ptr); }
+	const_iterator							cend() const { return const_iterator(&_root_parent); }
+	reverse_iterator						rbegin(){ return reverse_iterator(&_root_parent); }
+	reverse_iterator						rend(){ return reverse_iterator(prev_node(end())); }
+	const_reverse_iterator					crbegin() const { return const_reverse_iterator(&_root_parent); }
+	const_reverse_iterator					crend() const { return const_reverse_iterator(prev_node(end())); }
+
+
+	Node<T>*	prev_node(Node<T>* ptr)
+	{
+		if (ptr->left_child())
+			return (&(ptr->in_order_predecessor()));
+		while (ptr->is_left() && ptr->parent())
+			ptr = ptr->parent();
+		if (ptr->parent() == nullptr)
+			return ptr;
+		return ptr->parent();
+	}
+
+//////////------------------ CONSTRUCTION & ASSIGNMENT ---------------////////////////////
+
+		RBTree() : _size(0), _value_alloc(Allocator()) { _begin_ptr = end(); }
+		RBTree(const Node<T>& node) : _size(0) { _begin_ptr = end(); *this = node; }
+		RBTree(const RBTree& to_copy) : _size(0) { _begin_ptr = end(); *this = to_copy; }
+
+		RBTree& operator=(const Node<T>& node) 
+		{
+			if (root() != &node)
+			{
+				vector<const Node<T>*>	ptr_vec;
+				int						i = 0;
+
+				if (root()){
+					destroy_children(*(root()));
+					delete_single_node(*(root()));
+				}
+				ptr_vec.push_back(&node);
+				while (ptr_vec.size() > i)
+				{
+					if (ptr_vec[i]->left_child())
+						ptr_vec.push_back(ptr_vec[i]->left_child());
+					if ((ptr_vec[i]->right_child()))
+						ptr_vec.push_back(ptr_vec[i]->right_child());
+					this->insert((ptr_vec[i])->value());
+					i++;
+				}
+			}
+			return *this;
+		}
+
+		RBTree& operator=(const RBTree& tree)
+		{
+			if ((this != &tree) && tree.root())
+			{
+				vector<const Node<T>*>	ptr_vec;
+				int						i = 0;
+
+				if (root()){
+					destroy_children(*(root()));
+					delete_single_node(*(root()));
+				}
+				ptr_vec.push_back(tree.root());
+				while (ptr_vec.size() > i)
+				{
+					if (ptr_vec[i]->left_child())
+						ptr_vec.push_back(ptr_vec[i]->left_child());
+					if ((ptr_vec[i]->right_child()))
+						ptr_vec.push_back(ptr_vec[i]->right_child());
+					this->insert((ptr_vec[i])->value());
+					i++;
+				}
+			}
+			return *this;
+		}
+
+		~RBTree(){
+			if (root()){
+				destroy_children(*(root()));
+				delete_single_node(*(root()));
+			}
+		}
+
+//////////--------------------- GETTERS & SETTERS--------------------////////////////////
+
+		Node<T>*	root() const { return _root_parent.left_child(); }
+		void		set_root(Node<T>* ptr) { _root_parent.set_left_child(ptr); }
+		size_t		size() const { return _size; }
+		size_t		confirm_size() const { return root()->size(); }
+		void		set_begin_ptr(){
+			Node<T>*	temp = root();
+			while (temp->left_child()) 
+				temp = temp->left_child();
+			_begin_ptr = temp;
+		}
+
+//////////-------------------------- INSERT ------------------------////////////////////
+
+		Node<T>&	new_insert(const T& val)
+		{
+			_size++;
+			if (_size == 1)
+			{
+
+				set_root(_node_alloc.allocate(1));
+				_node_alloc.construct(root(), Node<T>(val));
+				root()->set_parent(&_root_parent);
+				root()->set_color(false);
+				_root_parent.set_color(false);
+				return *root();
+			}
+			return (insert(*root(), val));
+		}
+
+		Node<T>&	insert(Node<T>& node, const T& val)
+		{
+			Node<T>*			temp;
+			temp = &node;
+
+			while (temp)
+			{
+				if (Compare()(temp->value(), val)){
+					if (Compare()(val, temp->value()))
+						return _root_parent;
+					else if (temp->right_child())
+						temp = temp->right_child();
+					else{
+						temp->set_right_child(_node_alloc.allocate(1));
+						_node_alloc.construct(temp->right_child(), Node<T>(val));
+						temp->right_child()->set_parent(temp);
+						temp = temp->right_child();
+						break;
+					}
+				}
+				else{
+					if (!Compare()(val, temp->value()))
+						return _root_parent;
+					else if (temp->left_child())
+						temp = temp->left_child();
+					else{
+						temp->set_left_child(_node_alloc.allocate(1));
+						_node_alloc.construct(temp->left_child(), Node<T>(val));
+						temp->left_child()->set_parent(temp);
+						temp = temp->left_child();
+						break;
+					}
+				}
+			}
+			return *temp;
+		}
+
+		Node<T>&	insert(const T& val)
+		{
+			Node<T>&	inserted = new_insert(val);
+			Node<T>*	temp = &inserted;
+
+			if (&inserted == &_root_parent)
+				_size--;
+			else if (inserted.parent_is_black())
+			{ }
+			else if (inserted.uncle_is_black())
+				rotate_to_balance(inserted);
+			else{
+				while (temp->uncle_is_red())
+				{
+					temp->uncle()->set_color(black);
+					temp->parent()->set_color(black);
+					if (temp->parent()->parent() != this->root())
+					{
+						temp->parent()->parent()->set_color(red);
+						if (temp->parent()->parent()->parent_is_black())
+							break ;
+						else {
+							if (temp->parent()->parent()->uncle_is_black())
+							{
+								rotate_to_balance(*(temp->parent()->parent()));
+								break ;
+							}
+							else
+								temp = temp->parent()->parent();
+						}
+					}
+				}
+			}
+			set_begin_ptr();
+			return inserted;
+		}
+
+//////////-------------------------- DELETE ------------------------////////////////////
+
+		void	remove(Node<T>& node)
+		{
+			delete_single_node(node);
+			set_begin_ptr();
+			this->_size--;
+		}
+
+		void	remove(T value)
+		{
+			Node<T>*	temp = this->search(value);
+
+			if (temp){
+				delete_single_node(*temp);
+				set_begin_ptr();
+				this->_size--;
+			}
+		}
+
+		void	destroy_children(Node<T>& node)
+		{
+			stack<Node<T>*>		temp;
+			Node<T>*			current = &node;
+
+			while (current || !(temp.empty()))
+			{
+				while (current)
+				{
+					temp.push(current);
+					current = current->left_child();
+				}
+				while (!(temp.empty()) && !current)
+				{
+					current = temp.top()->right_child();
+					if (temp.top() != &node)
+					{
+						_node_alloc.destroy(temp.top());
+						_node_alloc.deallocate(temp.top(), 1);
+					}
+					temp.pop();
+				}
+			}
+			node.set_right_child(nullptr);
+			node.set_left_child(nullptr);
+			_size = root()->size();
+		}
+
+		void	delete_single_node(Node<T>& node)
+		{
+			int			offspring	= node.count_children();
+			Node<T>*	temp = &node;
+
+			if (offspring == 1)
+				delete_single_node(node.replace_value(node.single_child()));
+			else if (offspring == 2)
+				delete_single_node(node.replace_value(node.in_order_successor()));
+			else{
+				resolve_double_black(node);
+				*(node.parent_branch()) = nullptr;
+				this->_node_alloc.destroy(temp);
+				this->_node_alloc.deallocate(temp, 1);
+			}
+		}
+
+//////////------------------------ TRANSVERSE-----------------------////////////////////
+
+		void	level_order_transverse() 
+		{
+			vector<Node<T>*>	ptr_vec;
+			int					i = 0;
+
+			if (!root())
+				return;
+			ptr_vec.push_back(root());
+			while (ptr_vec.size() > i)
+			{
+				if (ptr_vec[i]->left_child())
+					ptr_vec.push_back(ptr_vec[i]->left_child());
+				if ((ptr_vec[i]->right_child()))
+					ptr_vec.push_back(ptr_vec[i]->right_child());
+				i++;
+			}
+		}
+
+//////////------------------------ PRINTERS -----------------------////////////////////
+
+		void	print_tree_in_order() const
+		{
+			stack<const Node<T>*>	temp;
+			const Node<T>*			current = root();
+
+			while (current || !(temp.empty()))
+			{
+				while (current)
+				{
+					temp.push(current);
+					current = current->left_child();
+				}
+				while (!(temp.empty()) && !current)
+				{
+					// std::cout << " ->" << temp.top()->value() << " bf: " << temp.top()->balance_factor();
+					std::cout << " ->" << temp.top()->value() << "\t(" << temp.top()->color() << ", " 
+						<< temp.top()->balance_factor() << ", " << temp.top()->parent()->value() << ")" << std::endl;
+					current = temp.top()->right_child();
+					temp.pop();
+				}
+			}
+		}
+
+		void	print_tree_by_level() const
+		{
+			vector<Node<T>*>	ptr_vec;
+			size_t					i = 0;
+
+			if (!root())
+				return;
+			ptr_vec.push_back(root());
+			while (ptr_vec.size() > i)
+			{
+				std::cout << " ->" << ptr_vec[i]->value() << "\t(" << ptr_vec[i]->color() << ", " << ptr_vec[i]->balance_factor() << ", " 
+							<< ptr_vec[i]->parent()->value() << ")" << std::endl;
+				if (ptr_vec[i]->left_child())
+					ptr_vec.push_back(ptr_vec[i]->left_child());
+				if ((ptr_vec[i]->right_child()))
+					ptr_vec.push_back(ptr_vec[i]->right_child());
+				
+				i++;
+			}
+		}
+
+//////////------------------------ HELPERS -----------------------////////////////////
+
+		Node<T>*	search(const T& value)
+		{
+			Node<T>*	node = root();
+
+			while (node != nullptr && node->value() != value)
+			{
+				if (Compare()(value, node->value()))
+					node = node->left_child();
+				else
+					node = node->right_child();
+			}
+			return node;
+		}
 
 		int		determine_setup(Node<T>& node)
 		{
@@ -45,11 +412,7 @@ namespace ft
 		{
 			Node<T>*	max;
 
-			max = &node;
-			if (max->left_child())
-				max = node.left_child();
-			else
-				return node;
+			max = node->left_child();
 			while (max->right_child())
 				max = max->right_child();
 			return *max;
@@ -59,19 +422,18 @@ namespace ft
 		{
 			Node<T>*	min;
 
-			min = &node;
-			if (min->right_child())
-				min = node.right_child();
-			else{
-				while(min->parent()->value() < node.value())
-					min = min->parent();
-				min = min->parent();
-				return *min;
-			}
+			min = node->right_child();
 			while (min->left_child())
 				min = min->left_child();
 			return *min;
 		}
+
+		int	balance_factor(Node<T>& node)
+		{
+			return node.balance_factor();
+		}
+
+//////////------------------------ REBALANCE -----------------------////////////////////
 
 		void	rotate_to_balance(Node<T>& node)
 		{
@@ -96,136 +458,6 @@ namespace ft
 			(*grand_parent_position)->right_child()->set_color(red);
 			(*grand_parent_position)->left_child()->set_color(red);
 		}
-
-		virtual Node<T>&	new_insert(T val)
-		{
-			_size++;
-			if (_size == 1)
-			{
-				set_root(_node_alloc.allocate(1));
-				_node_alloc.construct(root(), Node<T>(val));
-				root()->set_parent(&_root_parent);
-				root()->set_color(false);
-				_root_parent.set_color(false);
-				return *root();
-			}
-			return (insert(*root(), val));
-		}
-
-		Node<T>&	insert(Node<T>& node, T val)
-		{
-			Node<T>*			temp;
-			temp = &node;
-
-			while (temp)
-			{
-				if (Compare()(temp->value(), val)){
-					if (temp->right_child())
-						temp = temp->right_child();//
-					else if (Compare()(temp->value(), val) == Compare()(val, temp->value()))
-						break;
-					else{
-						temp->set_right_child(_node_alloc.allocate(1));
-						_node_alloc.construct(temp->right_child(), Node<T>(val));
-						temp->right_child()->set_parent(temp);
-						temp = temp->right_child();//
-						break;
-					}
-				}
-				else{
-					if (temp->left_child())
-						temp = temp->left_child();//
-					else if (Compare()(temp->value(), val) == Compare()(val, temp->value()))
-						break;
-					else{
-						temp->set_left_child(_node_alloc.allocate(1));
-						_node_alloc.construct(temp->left_child(), Node<T>(val));
-						temp->left_child()->set_parent(temp);
-						temp = temp->left_child();//
-						break;
-					}
-				}
-			}
-			return *temp;
-		}
-
-		virtual Node<T>&	insert(T val)
-		{
-			Node<T>&	inserted = new_insert(val);
-			Node<T>*	temp = &inserted;
-			int			setup = 0;
-				int	i = 0;
-
-			if (inserted.parent_is_black())
-				return inserted;
-			else if (inserted.uncle_is_black())
-			{
-				rotate_to_balance(inserted);
-				return inserted;
-			}
-			while (temp->uncle_is_red())
-			{
-				temp->uncle()->set_color(black);
-				temp->parent()->set_color(black);
-				if (temp->parent()->parent() != this->root())
-				{
-					temp->parent()->parent()->set_color(red);
-					if (temp->parent()->parent()->parent_is_black())
-						break ;
-					else {
-						if (temp->parent()->parent()->uncle_is_black())
-						{
-							rotate_to_balance(*(temp->parent()->parent()));
-							break ;
-						}
-						else
-							temp = temp->parent()->parent();
-					}
-				}
-			}
-			return inserted;
-		}
-
-		void	remove(Node<T>& node)
-		{
-			delete_single_node(node);
-			this->_size--;
-		}
-
-		virtual void	remove(T value)
-		{
-			Node<T>*	temp = this->search(value);
-
-			if (temp){
-				delete_single_node(*temp);
-				this->_size--;
-			}
-		}
-
-		virtual void	delete_single_node(Node<T>& node)
-		{
-			int			offspring	= node.count_children();
-			Node<T>*	temp = &node;
-
-			if (offspring == 1)
-				delete_single_node(node.replace_value(node.single_child()));
-			else if (offspring == 2)
-				delete_single_node(node.replace_value(node.in_order_successor()));
-			else{
-				resolve_double_black(node);
-				*(node.parent_branch()) = nullptr;
-				this->_node_alloc.destroy(temp);
-				this->_node_alloc.deallocate(temp, 1);
-			}
-		}
-
-/*
-	case 1 & 2: node is red || node is root
-	case 3: 	S,D,C are all black
-	case 4:		S is red
-	case 5:		S,D are black. C is red
-	case 6:		D is red
-*/
 
 		void	resolve_double_black(Node<T>& node)
 		{
@@ -272,7 +504,6 @@ namespace ft
 		int	double_black_case_type(Node<T>& node)
 		{
 			Node<T>*	sib = node.sibling();
-			Node<T>*	par = node.parent();
 			Node<T>*	close_neph = node.close_nephew();
 			Node<T>*	distant_neph = node.distant_nephew();
 
@@ -288,49 +519,84 @@ namespace ft
 				return 6;
 			return 0;
 		}
+//////////------------------------ TESTING -----------------------////////////////////
 
-		void	delete_node_and_children(Node<T>& node)
+		void	test_node()
 		{
-			delete_children(node);
-			remove(node);
+			// remove(79);
+			// remove(18);
+			remove("B");
+			remove("B");
+			remove("CC");
+			remove("AA");
+			// remove(78);
+			// remove(28);
+			// remove(35);/////////
+			// remove(81);
+			// remove(99);
+			// remove(74);
+			// remove(47);
+			// remove(5);
+			// remove(80);
+			// remove(93);
+			// remove(65);
+			// remove(33);
+			// remove(69);
+			// remove(37);
+			// remove(71);
+			// remove(36);
+			// remove(20);
+			// remove(95);
+			// remove(48);
+			// remove(21);
+			// remove(63);
+			// remove(73);
+			// remove(3);
+			// remove(16);
+			// remove(7);
+			// remove(9);
+			// remove(94);////
+			// remove(55);
+			// remove(14);
+			// remove(6);
+			// remove(61);
+			// remove(27);/////
+			// remove(89);
+			// remove(49);
+			// remove(66);
+			// remove(82);
+			PRINT("<<<<<--------->>>>>>", GREEN);
+			print_tree_by_level();
+			// remove(26);
+			// remove(70);///
+			// remove(68);
+			// remove(58);
+			// remove(2);
+			// remove(44);
+			// remove(88);
+			// remove(85);
+			// print_tree_in_order();
+			// level_order_transverse();
 		}
-
-		void	delete_children(Node<T>& node)
-		{
-			stack<Node<T>*>		temp;
-			Node<T>*			current = &node;
-
-			while (current || !(temp.empty()))
-			{
-				while (current)
-				{
-					temp.push(current);
-					current = current->left_child();
-				}
-				while (!(temp.empty()) && !current)
-				{
-					current = temp.top()->right_child();
-					if (temp.top() != &node)
-						remove(*(temp.top()));
-					temp.pop();
-				}
-			}
-		}
-
-		int	balance_factor(Node<T>& node)
-		{
-			return node.balance_factor();
-		}
-
-		size_t	size() const { return _size; }
 
 	protected:
 		Node<T>						_root_parent;
+		Node<T>*					_begin_ptr;
 		size_t						_size;
+		Allocator					_value_alloc;
 		node_allocator				_node_alloc;
 	};
 
 }
+
+/*
+	Delete cases
+	case 1 & 2: node is red || node is root
+	case 3: 	S,D,C are all black
+	case 4:		S is red
+	case 5:		S,D are black. C is red
+	case 6:		D is red
+*/
 
 /*
 
