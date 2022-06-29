@@ -37,38 +37,32 @@ namespace ft
 
 	public:
 		typedef typename Allocator::template rebind< Node<T> >::other	node_allocator;
-		typedef Node<T>													node_type;
-		typedef node_type*												node_ptr;
-		typedef node_ptr												node_pointer;
-		typedef typename alloc_traits::pointer         					pointer;
-    	typedef typename alloc_traits::const_pointer  					const_pointer;
-    	typedef typename alloc_traits::size_type       					size_type;
-    	typedef typename alloc_traits::difference_type					difference_type;
+		typedef Node<T>*												node_pointer;
+		typedef typename Allocator::pointer         					pointer;
+    	typedef typename Allocator::const_pointer  						const_pointer;
+		typedef typename Allocator::reference         					reference;
+    	typedef typename Allocator::const_reference  					const_reference;
+    	typedef typename Allocator::size_type       					size_type;
+    	typedef typename Allocator::difference_type						difference_type;
 
 //////////-------------------------- ITERATORS ----------------------////////////////////
 	
 	public:
-		typedef	bidirectional_iterator_tag								iterator_category;
 		typedef	treeIterator<T>											iterator;
-		typedef	treeIterator<const T>									const_iterator;
+		typedef	const_treeIterator<T>									const_iterator;
 		typedef	treeReverseIterator<T>									reverse_iterator;
-		typedef	treeReverseIterator<const T>							const_reverse_iterator;
-		typedef	const value_type& 										const_reference;
-		typedef value_type&												reference;
+		typedef	const_treeReverseIterator<T>							const_reverse_iterator;
+		typedef	bidirectional_iterator_tag								iterator_category;
 
-	// node_pointer	end() { return &_root_parent; };
-	// node_pointer	rend() { return prev_node(end()); };
-	// node_pointer	begin() { return _begin_ptr; }
-	// node_pointer	rbegin() { return &_root_parent; }
 public:
 	iterator								begin(){ return iterator(_begin_ptr); }
 	iterator								end(){ return iterator(&_root_parent); }
 	const_iterator							cbegin() const { return const_iterator(_begin_ptr); }
 	const_iterator							cend() const { return const_iterator(&_root_parent); }
-	reverse_iterator						rbegin(){ return reverse_iterator(&_root_parent); }
-	reverse_iterator						rend(){ return reverse_iterator(prev_node(end())); }
-	const_reverse_iterator					crbegin() const { return const_reverse_iterator(&_root_parent); }
-	const_reverse_iterator					crend() const { return const_reverse_iterator(prev_node(end())); }
+	reverse_iterator						rbegin(){ return reverse_iterator(get_end_ptr()); }
+	reverse_iterator						rend(){ return reverse_iterator(&_root_parent); }
+	const_reverse_iterator					crbegin() const { return const_iterator(get_end_ptr()); }
+	const_reverse_iterator					crend() const { return const_iterator(&_root_parent); }
 
 
 	Node<T>*	prev_node(Node<T>* ptr)
@@ -84,9 +78,9 @@ public:
 
 //////////------------------ CONSTRUCTION & ASSIGNMENT ---------------////////////////////
 
-		RBTree() : _size(0), _value_alloc(Allocator()) { _begin_ptr = end(); }
-		RBTree(const Node<T>& node) : _size(0) { _begin_ptr = end(); *this = node; }
-		RBTree(const RBTree& to_copy) : _size(0) { _begin_ptr = end(); *this = to_copy; }
+		RBTree() : _size(0), _value_alloc(Allocator()) { _begin_ptr = &_root_parent; }
+		RBTree(const Node<T>& node) : _size(0) { _begin_ptr = &_root_parent; *this = node; }
+		RBTree(const RBTree& to_copy) : _size(0) { _begin_ptr = &_root_parent; *this = to_copy; }
 
 		RBTree& operator=(const Node<T>& node) 
 		{
@@ -156,6 +150,12 @@ public:
 			while (temp->left_child()) 
 				temp = temp->left_child();
 			_begin_ptr = temp;
+		}
+		const Node<T>*		get_end_ptr() const {
+			Node<T>*	temp = root();
+			while (temp->right_child()) 
+				temp = temp->right_child();
+			return temp;
 		}
 
 //////////-------------------------- INSERT ------------------------////////////////////
@@ -525,10 +525,10 @@ public:
 		{
 			// remove(79);
 			// remove(18);
-			remove("B");
-			remove("B");
-			remove("CC");
-			remove("AA");
+			// remove("B");
+			// remove("B");
+			// remove("CC");
+			// remove("AA");
 			// remove(78);
 			// remove(28);
 			// remove(35);/////////

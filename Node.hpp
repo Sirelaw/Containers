@@ -11,6 +11,15 @@ namespace ft
 	class Node
 	{
 	public:
+		typedef T														value_type;
+		typedef Node<T>													node_type;
+		typedef Node<T>*												pointer;
+		typedef	const Node<T>*											const_pointer;
+		typedef Node<T>&												reference;
+		typedef	const Node<T>& 											const_reference;
+		typedef	std::ptrdiff_t											difference_type;
+
+	public:
 		Node(T value = T(), Node* parent = nullptr, Node* right_child = nullptr, Node* left_child = nullptr)
 			: _parent(parent), _right_child(right_child), _left_child(left_child), _value(value), _color(true) {}
 		Node(const Node& to_copy) { *this = to_copy; }
@@ -27,7 +36,7 @@ namespace ft
 			return *this;
 		}
 
-		Node&	replace_value(Node& other)
+		Node&	replace_value( Node& other)
 		{
 			set_value(other.value());
 			return other;
@@ -59,7 +68,7 @@ namespace ft
 			return *min;
 		}
 
-		Node*	maximum() const
+		const Node*	maximum() const
 		{
 			const Node*	max;
 
@@ -70,7 +79,7 @@ namespace ft
 			return max;
 		}
 
-		Node*	minimum() const
+		const Node*	minimum() const
 		{
 			const Node*	min;
 

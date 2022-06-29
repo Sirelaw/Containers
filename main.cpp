@@ -125,59 +125,33 @@ int main()
 	temp.insert("D");
 	temp.insert("E");
 	temp.insert("F");
-	temp.insert("G");
-	temp.insert("H");
-	temp.insert("I");
-	temp.insert("J");
-	temp.insert("K");
-	temp.insert("L");
-	temp.insert("M");
-	temp.insert("N");
-	temp.insert("O");
-	temp.insert("P");
-	temp.insert("Q");
-	temp.insert("R");
-	temp.insert("S");
-	temp.insert("T");
-	temp.insert("U");
-	temp.insert("V");
-	temp.insert("W");
-	temp.insert("X");
-	temp.insert("Y");
-	temp.insert("Z");
-	temp.insert("CA");
-	temp.insert("CB");
-	temp.insert("CC");
-	temp.insert("CD");
-	temp.insert("CE");////
-	temp.insert("CF");
-	temp.insert("CG");
-	temp.insert("CH");
-	temp.insert("CI");
-	temp.insert("CJ");/////
-	temp.insert("CK");
-	temp.insert("CL");
-	temp.insert("CM");
-	temp.insert("CN");
-	temp.insert("CO");
-	temp.insert("CP");///
-	temp.insert("CQ");
-	temp.insert("CR");
-	temp.insert("CS");
-	temp.insert("CT");
-	temp.insert("CU");
-	temp.insert("CV");
-	temp.insert("CW");
-	temp.insert("CX");
-	temp.insert("CY");
-	temp.insert("CZ");
 
 	temp.test_node();
-	for (ft::RBTree<std::string>::reverse_iterator iter = temp.rbegin(); iter != temp.rend(); ++iter)
-		PRINT(iter->value(), RED);
-	PRINT(temp.size(), GREEN);
-	PRINT(temp.confirm_size(), GREEN);
 
-	atexit(check);
+	// ft::RBTree<std::string>::iterator iter = temp.begin();
+	// 	PRINT(iter->value(), RED);
+	// iter = temp.end();
+	// 	PRINT(iter->value(), RED);
+	// ft::RBTree<std::string>::reverse_iterator r_iter = temp.rbegin();
+	// 	PRINT(r_iter->value(), RED);
+	// r_iter = temp.rend();
+	// 	PRINT(r_iter->value(), RED);
+	// 	PRINT(iter->value(), RED);
+	// r_iter = temp.rend();
+	// 	PRINT(r_iter->value(), RED);
+
+
+	for (ft::RBTree<std::string>::const_reverse_iterator iter = temp.crbegin(); iter != temp.crend(); ++iter)
+	// for (ft::RBTree<std::string>::const_iterator iter = temp.cbegin(); iter != temp.cend(); ++iter)
+	{
+		PRINT(iter->value(), RED);
+		PRINT((iter + 4)->value(), GREEN);
+		// std::cout << RED << iter->value() << RESET << std::endl;
+		// std::cout << GREEN << (iter + 4)->value() << RESET << std::endl;
+	}
+	// PRINT(temp.size(), GREEN);
+	// PRINT(temp.confirm_size(), GREEN);
+
+	// atexit(check);
 	return (0);
 }
