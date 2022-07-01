@@ -5,6 +5,7 @@
 #include <string>
 #include "Pair.hpp"
 #include "RBTree.hpp"
+#include "TreeIterator.hpp"
 #include "IteratorTraits.hpp"
 
 namespace ft
@@ -28,15 +29,32 @@ namespace ft
 		//------------------ Iterator_tags ------------------------------------------//
 
 		typedef	bidirectional_iterator_tag						iterator_category;
-		// typedef __tree_iterator<value_type, __node_pointer, difference_type>             iterator;
-		typedef typename iterator_traits<map>::pointer			iterator;
-		typedef typename iterator_traits<map>::const_pointer	const_iterator;
-		typedef std::reverse_iterator<iterator>					reverse_iterator;
-		typedef	std::reverse_iterator<const_iterator>			const_reverse_iterator;
+		typedef typename treeIterator<T>::pointer				iterator;
+		typedef typename const_treeIterator<T>::pointer			const_iterator;
+		typedef typename ft::reverse_iterator<iterator>			reverse_iterator;
+		typedef	typename ft::reverse_iterator<const_iterator>	const_reverse_iterator;
+
+		//----------------------- extras ------------------------------------------//
+
+		typedef Node<T>											node_type;
+
+		// typedef typename template <class Iter, class NodeType>
+		// struct insert_type {
+		// 	Iter		position;
+		// 	bool		inserted;
+		// 		NodeType 	node;
+		// } insert_return_type;
 
 	public:
 		map();
-		map(const map& to_copy);
+		map(const map& other) { _tree = other._tree; }
+		template< class InputIt >
+		map( InputIt first, InputIt last, const Compare& comp = Compare(),
+			const Allocator& alloc = Allocator() )
+		{
+			for (iterator temp = first; temp != last; ++temp)
+				_tree.insert(*temp);
+		}
 		~map();
 		map& operator=(const map& to_assign)
 		{
@@ -46,7 +64,12 @@ namespace ft
 			}
 			return (*this);
 		}
+
+	private:
+		RBTree<value_type, value_compare<Key, Compare>, Allocator>	_tree;
+
 	};
+
 }
 
 #endif

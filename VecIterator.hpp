@@ -24,10 +24,12 @@ namespace ft
 		//---------------------------------------------------------------------------//
 
 	public:
-		vecIterator(T* ptr = nullptr) 			{_ptr = ptr;}
+		vecIterator(T* ptr = nullptr) : _ptr(ptr)						{ }
+		vecIterator(const vecIterator& other) : _ptr(other.getPtr())	{ }
 		~vecIterator(){}
 
 		vecIterator<T>&							operator=(T* ptr) { _ptr = ptr; return *this; }
+		vecIterator<T>&							operator=(vecIterator<T>& other) { _ptr = other.getPtr(); return *this; }
 		
 		operator								pointer() const { return (_ptr); }
 

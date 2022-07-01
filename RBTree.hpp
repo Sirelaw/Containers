@@ -50,35 +50,24 @@ namespace ft
 	public:
 		typedef	treeIterator<T>											iterator;
 		typedef	const_treeIterator<T>									const_iterator;
-		typedef	treeReverseIterator<T>									reverse_iterator;
-		typedef	const_treeReverseIterator<T>							const_reverse_iterator;
+		typedef	ft::reverse_iterator<iterator>								reverse_iterator;
+		typedef	ft::reverse_iterator<const_iterator>					const_reverse_iterator;
 		typedef	bidirectional_iterator_tag								iterator_category;
 
+		// typedef	const_treeReverseIterator<T>							const_reverse_iterator;
 public:
 	iterator								begin(){ return iterator(_begin_ptr); }
 	iterator								end(){ return iterator(&_root_parent); }
 	const_iterator							cbegin() const { return const_iterator(_begin_ptr); }
 	const_iterator							cend() const { return const_iterator(&_root_parent); }
-	reverse_iterator						rbegin(){ return reverse_iterator(get_end_ptr()); }
-	reverse_iterator						rend(){ return reverse_iterator(&_root_parent); }
-	const_reverse_iterator					crbegin() const { return const_iterator(get_end_ptr()); }
-	const_reverse_iterator					crend() const { return const_iterator(&_root_parent); }
-
-
-	Node<T>*	prev_node(Node<T>* ptr)
-	{
-		if (ptr->left_child())
-			return (&(ptr->in_order_predecessor()));
-		while (ptr->is_left() && ptr->parent())
-			ptr = ptr->parent();
-		if (ptr->parent() == nullptr)
-			return ptr;
-		return ptr->parent();
-	}
+	reverse_iterator						rbegin(){ return reverse_iterator(&_root_parent); }
+	reverse_iterator						rend(){ return reverse_iterator(_begin_ptr); }
+	const_reverse_iterator					crbegin() const { return const_iterator(&_root_parent); }
+	const_reverse_iterator					crend() const { return const_iterator(_begin_ptr); }
 
 //////////------------------ CONSTRUCTION & ASSIGNMENT ---------------////////////////////
 
-		RBTree() : _size(0), _value_alloc(Allocator()) { _begin_ptr = &_root_parent; }
+		RBTree() : _size(0) { _begin_ptr = &_root_parent; }
 		RBTree(const Node<T>& node) : _size(0) { _begin_ptr = &_root_parent; *this = node; }
 		RBTree(const RBTree& to_copy) : _size(0) { _begin_ptr = &_root_parent; *this = to_copy; }
 
@@ -151,7 +140,7 @@ public:
 				temp = temp->left_child();
 			_begin_ptr = temp;
 		}
-		const Node<T>*		get_end_ptr() const {
+		Node<T>*		get_end_ptr() const {
 			Node<T>*	temp = root();
 			while (temp->right_child()) 
 				temp = temp->right_child();
@@ -583,7 +572,6 @@ public:
 		Node<T>						_root_parent;
 		Node<T>*					_begin_ptr;
 		size_t						_size;
-		Allocator					_value_alloc;
 		node_allocator				_node_alloc;
 	};
 

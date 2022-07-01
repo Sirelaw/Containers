@@ -142,6 +142,8 @@ int main()
 
 
 	for (ft::RBTree<std::string>::const_reverse_iterator iter = temp.crbegin(); iter != temp.crend(); ++iter)
+	// for (ft::RBTree<std::string>::reverse_iterator iter = temp.rbegin(); iter != temp.rend(); ++iter)
+	// for (ft::RBTree<std::string>::iterator iter = temp.begin(); iter != temp.end(); ++iter)
 	// for (ft::RBTree<std::string>::const_iterator iter = temp.cbegin(); iter != temp.cend(); ++iter)
 	{
 		PRINT(iter->value(), RED);
@@ -155,3 +157,20 @@ int main()
 	// atexit(check);
 	return (0);
 }
+
+
+// iterator_traits example
+// #include <iostream>     // std::cout
+// #include <iterator>     // std::iterator_traits
+// #include <typeinfo>     // typeid
+
+// int main() {
+//   typedef ft::iterator_traits<int*> traits;
+//   if (typeid(traits::iterator_category)==typeid(std::random_access_iterator_tag))
+//     std::cout << "int* is a random-access iterator";
+//   return 0;
+// }
+
+
+
+

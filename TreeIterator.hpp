@@ -6,7 +6,6 @@
 
 #include "IteratorTraits.hpp"
 #include "Node.hpp"
-
 namespace ft
 {
 
@@ -17,7 +16,7 @@ namespace ft
 	public:
 		typedef T														value_type;
 		typedef Node<T>													node_type;
-		typedef Node<T>*														pointer;
+		typedef Node<T>*												pointer;
 		typedef	const Node<T>*											const_pointer;
 		typedef Node<T>&												reference;
 		typedef	const Node<T>& 											const_reference;
@@ -29,6 +28,7 @@ namespace ft
 
 	public:
 		treeIterator(Node<T>* ptr = nullptr) : _ptr(ptr)				{ }
+		treeIterator(const treeIterator& other) : _ptr(other.getPtr())	{ }
 		~treeIterator(){}
 
 		Node<T>*	next_node(Node<T>* ptr)
@@ -59,16 +59,16 @@ namespace ft
 			return ptr->parent();
 		}
 
-		Node<T>&							operator=(Node<T>* ptr) { _ptr = ptr; return *this; }
-		
+		treeIterator&							operator=(const treeIterator& other) { _ptr = other.getPtr(); return *this; }
+
 		operator								pointer() const { return (_ptr); }
 
-		bool									operator==(const Node<T>& rawIterator)const{return (_ptr == rawIterator.getConstPtr()); }
-		bool									operator!=(const Node<T>& rawIterator)const{return (_ptr != rawIterator.getConstPtr()); }
-		bool									operator<(const Node<T>& rawIterator)const{return (_ptr->value() < rawIterator.getConstPtr()->value()); }
-		bool									operator<=(const Node<T>& rawIterator)const{return (_ptr->value() <= rawIterator.getConstPtr()->value()); }
-		bool									operator>(const Node<T>& rawIterator)const{return (_ptr->value() > rawIterator.getConstPtr()->value()); }
-		bool									operator>=(const Node<T>& rawIterator)const{return (_ptr->value() >= rawIterator.getConstPtr()->value()); }
+		bool									operator==(const treeIterator& rawIterator)const{return (_ptr == rawIterator.getConstPtr()); }
+		bool									operator!=(const treeIterator& rawIterator)const{return (_ptr != rawIterator.getConstPtr()); }
+		bool									operator<(const treeIterator& rawIterator)const{return (_ptr->value() < rawIterator.getConstPtr()->value()); }
+		bool									operator<=(const treeIterator& rawIterator)const{return (_ptr->value() <= rawIterator.getConstPtr()->value()); }
+		bool									operator>(const treeIterator& rawIterator)const{return (_ptr->value() > rawIterator.getConstPtr()->value()); }
+		bool									operator>=(const treeIterator& rawIterator)const{return (_ptr->value() >= rawIterator.getConstPtr()->value()); }
 
 		treeIterator<T>&							operator+=(const difference_type& movement) {
 			difference_type temp = movement;
@@ -100,11 +100,11 @@ namespace ft
 		}
 
 		Node<T>&										operator*(){ return *_ptr; }
-		Node<const T>&								operator*() const { return *_ptr; }
+		const Node<T>&								operator*() const { return *_ptr; }
 		Node<T>*										operator->() const { return _ptr; }
 
 		Node<T>*										getPtr() const { return _ptr; }
-		Node<const T>*								getConstPtr() const { return _ptr; }
+		const Node<T>*								getConstPtr() const { return _ptr; }
 
 	protected:
 		Node<T>*	_ptr;
@@ -117,9 +117,9 @@ namespace ft
 	public:
 		typedef T														value_type;
 		typedef Node<T>													node_type;
-		typedef const Node<T>*												pointer;
+		typedef const Node<T>*											pointer;
 		typedef	const Node<T>*											const_pointer;
-		typedef const Node<T>&												reference;
+		typedef const Node<T>&											reference;
 		typedef	const Node<T>& 											const_reference;
 		typedef	std::ptrdiff_t											difference_type;
 		typedef	bidirectional_iterator_tag								iterator_category;
@@ -128,7 +128,8 @@ namespace ft
 	
 
 	public:
-		const_treeIterator(const Node<T>* ptr = nullptr) 	: _ptr(ptr)		{ }
+		const_treeIterator(const Node<T>* ptr = nullptr)	: _ptr(ptr)		{ }
+		const_treeIterator(const const_treeIterator& other) : _ptr(other.getPtr())	{ } /////////
 		~const_treeIterator(){}
 
 		const Node<T>*	next_node(const Node<T>* ptr)
@@ -159,8 +160,8 @@ namespace ft
 			return ptr->parent();
 		}
 
-		Node<T>&							operator=(Node<T>* ptr) { _ptr = ptr; return *this; }
-		
+		const_treeIterator&						operator=(const const_treeIterator& other) { _ptr = other.getPtr(); return *this; } /////////
+	
 		operator								pointer() const { return (_ptr); }
 
 		bool									operator==(const Node<T>& rawIterator)const{return (_ptr == rawIterator.getConstPtr()); }
@@ -209,105 +210,8 @@ namespace ft
 	protected:
 		const Node<T>*	_ptr;
 	};
+
 	//-----------------------------------------------------------------------------//
-
-	template<typename T>
-	class treeReverseIterator : public treeIterator<T>
-	{
-		//------------------ Typedefs------------------------------------------//
-	public:
-		typedef	typename treeIterator<T>::difference_type							difference_type;
-
-	public:
-		treeReverseIterator(const Node<T>* ptr = nullptr) : treeIterator<T>(ptr) {}
-		treeReverseIterator(const Node<T>& rawIterator) : treeIterator<T>(rawIterator.getPtr()) { }
-		~treeReverseIterator() {};
-
-		treeReverseIterator<T>&					operator=(const Node<T>& rawIterator) { this->_ptr = rawIterator.getPtr(); return (*this); }
-		treeReverseIterator<T>&					operator=(Node<T>* ptr) { this->_ptr = ptr; return (*this); }
-
-		treeReverseIterator<T>&							operator+=(const difference_type& movement) {
-			difference_type temp = movement;
-			while (temp--)
-				this->_ptr = treeIterator<T>::prev_node(this->_ptr); 
-			return (*this);
-		}
-		treeReverseIterator<T>&							operator-=(const difference_type& movement) {
-			difference_type temp = movement;
-			while (temp--)
-				this->_ptr = treeIterator<T>::next_node(this->_ptr); 
-			return (*this);
-		}
-
-		treeReverseIterator<T>&							operator++() { this->_ptr = treeIterator<T>::prev_node(this->_ptr); return (*this); }
-		treeReverseIterator<T>&							operator--() { this->_ptr = treeIterator<T>::next_node(this->_ptr); return (*this); }
-		treeReverseIterator<T>							operator++(int) {treeReverseIterator<T> temp(*this); this->_ptr = prev_node(this->_ptr); return (temp); }
-		treeReverseIterator<T>							operator--(int) {treeReverseIterator<T> temp(*this); this->_ptr = next_node(this->_ptr); return (temp); }
-		treeReverseIterator<T>							operator+(const difference_type& movement) const { treeReverseIterator<T> temp(*this); temp -= movement; return (temp); }
-		treeReverseIterator<T>							operator-(const difference_type& movement) const { treeReverseIterator<T> temp(*this); temp += movement; return (temp); }
-
-		difference_type							operator-(const treeIterator<T>& rawIterator) const {
-			difference_type		temp = 0;
-			treeIterator<T>		temp_iter(*this);
-			while (temp_iter.getConstPtr() != rawIterator.getConstPtr()){
-				++temp_iter;
-				++temp;
-			}
-			return (temp);
-		}
-
-		treeIterator<T>							base() { treeIterator<T> forwardIterator(this->_ptr); ++forwardIterator; return (forwardIterator); }
-	};
-
-		//-------------------- Const Reverse Iterators ------------------------------------------//
-
-	template<typename T>
-	class const_treeReverseIterator : public const_treeIterator<T>
-	{
-		//------------------ Typedefs------------------------------------------//
-	public:
-		typedef	typename const_treeIterator<T>::difference_type							difference_type;
-
-	public:
-		const_treeReverseIterator(Node<T>* ptr = nullptr) : const_treeIterator<T>(ptr) {}
-		const_treeReverseIterator(const const_treeIterator<T>& rawIterator){ this->_ptr = rawIterator.getPtr(); }
-		~const_treeReverseIterator() {};
-
-		const_treeReverseIterator<T>&					operator=(const Node<T>& rawIterator) { this->_ptr = rawIterator.getPtr(); return (*this); }
-		const_treeReverseIterator<T>&					operator=(Node<T>* ptr) { this->_ptr = ptr; return (*this); }
-
-		const_treeReverseIterator<T>&							operator+=(const difference_type& movement) {
-			difference_type temp = movement;
-			while (temp--)
-				this->_ptr = this->prev_node(this->_ptr); 
-			return (*this);
-		}
-		const_treeReverseIterator<T>&							operator-=(const difference_type& movement) {
-			difference_type temp = movement;
-			while (temp--)
-				this->_ptr = this->next_node(this->_ptr); 
-			return (*this);
-		}
-
-		const_treeReverseIterator<T>&							operator++() { this->_ptr = const_treeIterator<T>::prev_node(this->_ptr); return (*this); }
-		const_treeReverseIterator<T>&							operator--() { this->_ptr = const_treeIterator<T>::next_node(this->_ptr); return (*this); }
-		const_treeReverseIterator<T>							operator++(int) {const_treeReverseIterator<T> temp(*this); this->_ptr = prev_node(this->_ptr); return (temp); }
-		const_treeReverseIterator<T>							operator--(int) {const_treeReverseIterator<T> temp(*this); this->_ptr = next_node(this->_ptr); return (temp); }
-		const_treeReverseIterator<T>							operator+(const difference_type& movement) const { const_treeReverseIterator<T> temp(*this); temp -= movement; return (temp); }
-		const_treeReverseIterator<T>							operator-(const difference_type& movement) const { const_treeReverseIterator<T> temp(*this); temp += movement; return (temp); }
-
-		difference_type							operator-(const const_treeIterator<T>& rawIterator) const {
-			difference_type		temp = 0;
-			const_treeIterator<T>		temp_iter(*this);
-			while (temp_iter.getConstPtr() != rawIterator.getConstPtr()){
-				++temp_iter;
-				++temp;
-			}
-			return (temp);
-		}
-
-		const_treeIterator<T>							base() { const_treeIterator<T> forwardIterator(this->_ptr); ++forwardIterator; return (forwardIterator); }
-	};
 
 	template<typename T>
 	std::ostream& operator<<(std::ostream& out, treeIterator<T> iter) {out << iter.getConstPtr(); return out; }
