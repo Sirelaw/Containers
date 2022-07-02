@@ -1,5 +1,6 @@
 // #include <type_traits>
 #include <iostream>
+#include "utils.hpp"
 
 template<bool>
 	struct	enable_if {};
@@ -7,17 +8,17 @@ template<bool>
 template<>
 struct	enable_if<true>
 {
-	using type = void;
+	typedef	void type;
 };
 
-template <class T, class = typename enable_if<std::is_unsigned<T>::value>::type>
+template <class T, class = typename enable_if<ft::is_integral<T>::value>::type>
 void foo(T){
-	std::cout << "T is unsigned" << std::endl;
+	std::cout << "T is NOT integral" << std::endl;
 }
 
 template<class T>
 void foo(T){
-	std::cout << "T is signed" << std::endl;
+	std::cout << "T is integral" << std::endl;
 }
 
 struct A {};
@@ -32,8 +33,10 @@ struct C: T{};
 int main()
 {
 	int x = 5;
-
+	void *ptr = malloc(1);
+	
 	foo(x);
+	foo(ptr);
 
 	C<B>	c;
 	

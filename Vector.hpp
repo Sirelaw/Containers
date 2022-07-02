@@ -8,6 +8,7 @@
 #include <stdexcept>
 #include "VecIterator.hpp"
 #include "IteratorTraits.hpp"
+#include "utils.hpp"
 
 #include "verbose.hpp"
 
@@ -61,8 +62,9 @@ namespace ft
 				_alloc.construct(iter, T(value));
 		}
 		
-		template <class InputIt >
-		explicit vector( InputIt first, InputIt last, const Allocator& alloc = Allocator() ) 
+		template <class InputIt>
+		vector( InputIt first, InputIt last, const Allocator& alloc = Allocator(),
+				typename ft::enable_if<!ft::is_integral<InputIt>::value>::type* = nullptr)
 			: _capacity(0), _size(0){
 			_alloc = alloc;
 			_vec = _alloc.allocate(0);
@@ -111,21 +113,22 @@ namespace ft
 				_alloc.construct(iter, T(value));
 		}
 
-		// template< class InputIt >
-		// void assign( InputIt first, InputIt last )
-		// {
-		// 	size_type	count = last - first;
-		//
-		// 	this->clear();
-		// 	_size = count;
-		// 	if (count > capacity()){
-		// 		_alloc.deallocate(_vec, capacity());
-		// 		_vec = _alloc.allocate(count);
-		// 		_capacity = count;
-		// 	}
-		// 	for(iterator iter = begin(); iter != end() ; ++iter, ++first)
-		// 		_alloc.construct(iter, T(*first));
-		// }
+		template< class InputIt >
+		void assign( InputIt first, InputIt last,
+					typename ft::enable_if<!ft::is_integral<InputIt>::value>::type* = nullptr )
+		{
+			size_type	count = last - first;
+		
+			this->clear();
+			_size = count;
+			if (count > capacity()){
+				_alloc.deallocate(_vec, capacity());
+				_vec = _alloc.allocate(count);
+				_capacity = count;
+			}
+			for(iterator iter = begin(); iter != end() ; ++iter, ++first)
+				_alloc.construct(iter, T(*first));
+		}
 
 		reference 								at( size_type pos ){
 			if (pos >= size())
@@ -180,20 +183,21 @@ namespace ft
 			_size += count;
 		}
 
-		// template< class InputIt >
-		// void 									insert( iterator pos, InputIt first, InputIt last )
-		// {
-		// 	difference_type	step = pos - begin();
-		// 	size_type		count = last - first;
+		template< class InputIt >
+		void 									insert( iterator pos, InputIt first, InputIt last,
+												typename ft::enable_if<!ft::is_integral<InputIt>::value>::type* = nullptr )
+		{
+			difference_type	step = pos - begin();
+			size_type		count = last - first;
 
-		// 	reserve(size() + count);
-		// 	pos = begin() + step;
-		// 	for (reverse_iterator r_iter = rbegin(); pos <= r_iter; ++r_iter)
-		// 		_alloc.construct(r_iter + count, T(*r_iter));
-		// 	for(size_type i = count; i; --i)
-		// 		_alloc.construct(pos + i - 1, T(*(--last)));
-		// 	_size += count;
-		// }
+			reserve(size() + count);
+			pos = begin() + step;
+			for (reverse_iterator r_iter = rbegin(); pos <= r_iter; ++r_iter)
+				_alloc.construct(r_iter + count, T(*r_iter));
+			for(size_type i = count; i; --i)
+				_alloc.construct(pos + i - 1, T(*(--last)));
+			_size += count;
+		}
 
 		iterator erase( iterator pos )
 		{

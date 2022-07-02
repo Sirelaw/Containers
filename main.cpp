@@ -28,6 +28,24 @@ int main()
 {
 	ft::RBTree<std::string, ft::less<std::string>, std::allocator<std::string> >	temp;
 	std::map<int, int, ft::less<int> > test_map;
+	ft::vector<std::string> test_vec;
+	ft::vector<int> int_vec;
+	test_vec.push_back("hello");
+	test_vec.push_back("there");
+	test_vec.push_back("you");
+	int_vec.push_back(2);
+	int_vec.push_back(24);
+	int_vec.push_back(52);
+	ft::vector<std::string> new_vec(test_vec.begin(), test_vec.end());
+	ft::vector<std::string> latest_vec(5, "15");
+	ft::vector<int>			new_int_vec(int_vec.begin(), int_vec.end());
+	ft::vector<int>			latest_int_vec(10, 42);
+	PRINT(new_vec.size(), BLUE);
+	PRINT(latest_vec.size(), BLUE);
+	PRINT(new_vec[1], BLUE);
+	PRINT(latest_vec[1], BLUE);
+	PRINT(int_vec[1], BLUE);
+	PRINT(latest_int_vec[1], BLUE);
 	// ft::BSTree<int>	temp;
 
 	// ft::Node<int>	test;
@@ -153,7 +171,6 @@ int main()
 	}
 	// PRINT(temp.size(), GREEN);
 	// PRINT(temp.confirm_size(), GREEN);
-
 	// atexit(check);
 	return (0);
 }
