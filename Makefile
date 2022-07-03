@@ -26,6 +26,28 @@ $(NAME) : obj $(OBJ)
 	@$(CC) $(FLAGS) $(OBJ) -o $(NAME)
 	@echo "$(NAME) executable compiled!"
 
+SRC_FILES1 =  main1.cpp
+SRC_FILES2 =  main2.cpp
+SRC_FILES3 =  main3.cpp
+
+main1:
+	@c++ main1.cpp -c
+	@$(CC) $(FLAGS) main1.o -o $(NAME)
+	@echo "$(NAME) executable compiled for main1!"
+
+
+main2:
+	@c++ main2.cpp -c
+	@$(CC) $(FLAGS) main2.o -o $(NAME)
+	@echo "$(NAME) executable compiled for main2!"
+
+main3:
+	@c++ main3.cpp -c
+	@$(CC) $(FLAGS) main3.o -o $(NAME)
+	@echo "$(NAME) executable compiled for main3!"
+
+
+
 obj:
 	@mkdir -p $(OBJ_DIR)
 

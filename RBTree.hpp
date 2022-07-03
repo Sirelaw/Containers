@@ -293,9 +293,9 @@ public:
 			Node<T>*	temp = &node;
 
 			if (offspring == 1)
-				delete_single_node(node.replace_value(node.single_child()));
+				delete_single_node(node.swap_node(node.single_child()));
 			else if (offspring == 2)
-				delete_single_node(node.replace_value(node.in_order_successor()));
+				delete_single_node(node.swap_node(node.in_order_successor()));
 			else{
 				resolve_double_black(node);
 				*(node.parent_branch()) = nullptr;

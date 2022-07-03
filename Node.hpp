@@ -36,10 +36,22 @@ namespace ft
 			return *this;
 		}
 
-		Node&	replace_value( Node& other)
+		Node&	swap_node( Node& other)
 		{
-			set_value(other.value());
-			return other;
+			Node*	temp_parent = other.parent();
+			Node*	temp_left_child = other.left_child();
+			Node*	temp_right_child = other.right_child();
+			bool	temp_color = other.color();
+
+			other.set_color(color());
+			other.set_left_child(left_child());
+			other.set_right_child(right_child());
+			other.set_parent(parent());
+			set_color(temp_color);
+			set_left_child(temp_left_child);
+			set_right_child(temp_right_child);
+			set_parent(temp_parent);
+			return *this;
 		}
 
 		Node&	in_order_predecessor()

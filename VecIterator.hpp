@@ -11,7 +11,7 @@ namespace ft
 	template<typename T>
 	class vecIterator
 	{
-		//------------------ Typedefs------------------------------------------//
+		//------------------------- Typedefs-----------------------------------------//
 	public:
 		typedef	T								value_type;
 		typedef	std::ptrdiff_t					difference_type;
@@ -35,10 +35,10 @@ namespace ft
 
 		bool									operator==(const vecIterator<T>& rawIterator)const{return (_ptr == rawIterator.getConstPtr()); }
 		bool									operator!=(const vecIterator<T>& rawIterator)const{return (_ptr != rawIterator.getConstPtr()); }
-		bool									operator<(const vecIterator<T>& rawIterator)const{return (_ptr < rawIterator.getConstPtr()); }
-		bool									operator<=(const vecIterator<T>& rawIterator)const{return (_ptr <= rawIterator.getConstPtr()); }
 		bool									operator>(const vecIterator<T>& rawIterator)const{return (_ptr > rawIterator.getConstPtr()); }
 		bool									operator>=(const vecIterator<T>& rawIterator)const{return (_ptr >= rawIterator.getConstPtr()); }
+		bool									operator<(const vecIterator<T>& rawIterator)const{return (_ptr < rawIterator.getConstPtr()); }
+		bool									operator<=(const vecIterator<T>& rawIterator)const{return (_ptr <= rawIterator.getConstPtr()); }
 
 		vecIterator<T>&							operator+=(const difference_type& movement) { _ptr += movement; return (*this); }
 		vecIterator<T>&							operator-=(const difference_type& movement) { _ptr -= movement; return (*this); }

@@ -45,17 +45,22 @@ namespace ft
 		// 		NodeType 	node;
 		// } insert_return_type;
 
+		/*
+"ft::map<int, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, ft::less<int>,
+              std::__1::allocator<ft::pair<int const, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > > > >::map()"
+   */
+
 	public:
-		map();
+		map() {}
 		map(const map& other) { _tree = other._tree; }
 		template< class InputIt >
 		map( InputIt first, InputIt last, const Compare& comp = Compare(),
-			const Allocator& alloc = Allocator() )
+			const Allocator& alloc = Allocator() ) : _alloc(alloc), _value_compare(comp)
 		{
 			for (iterator temp = first; temp != last; ++temp)
 				_tree.insert(*temp);
 		}
-		~map();
+		~map() {};
 		map& operator=(const map& to_assign)
 		{
 			if (this != &to_assign)
@@ -66,6 +71,8 @@ namespace ft
 		}
 
 	private:
+		Allocator	_alloc;
+		Compare		_value_compare;
 		RBTree<value_type, value_compare<Key, Compare>, Allocator>	_tree;
 
 	};
