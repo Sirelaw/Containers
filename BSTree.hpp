@@ -93,7 +93,7 @@ namespace ft
 
 
 		Node<T>*	root() const { return _root_parent.left_child(); }
-		void		set_root(Node<T>* ptr) { _root_parent.set_left_child(ptr); }
+		void		set_root(Node<T>* ptr) { _root_parent.link_left_child(ptr); }
 
 		void	print_tree_in_order() const
 		{
@@ -181,7 +181,7 @@ namespace ft
 					else if (Compare()(temp->value(), val) == Compare()(val, temp->value()))
 						break;
 					else{
-						temp->set_right_child(_node_alloc.allocate(1));
+						temp->link_right_child(_node_alloc.allocate(1));
 						_node_alloc.construct(temp->right_child(), Node<T>(val));
 						temp->right_child()->set_parent(temp);
 						temp = temp->right_child();//
@@ -194,7 +194,7 @@ namespace ft
 					else if (Compare()(temp->value(), val) == Compare()(val, temp->value()))
 						break;
 					else{
-						temp->set_left_child(_node_alloc.allocate(1));
+						temp->link_left_child(_node_alloc.allocate(1));
 						_node_alloc.construct(temp->left_child(), Node<T>(val));
 						temp->left_child()->set_parent(temp);
 						temp = temp->left_child();//
@@ -268,8 +268,8 @@ namespace ft
 					temp.pop();
 				}
 			}
-			node.set_right_child(nullptr);
-			node.set_left_child(nullptr);
+			node.link_right_child(nullptr);
+			node.link_left_child(nullptr);
 			_size = root()->size();
 		}
 

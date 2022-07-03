@@ -48,44 +48,33 @@ namespace ft
 			bool	other_color = other.color();
 
 			*(this->parent_branch()) = &other;
-			if (left_child() == &other)
+			if (left_child() == &other || right_child() == &other)
 			{
-				this->set_parent(&other);
-				this->set_right_child(other_right_child);
-				this->set_left_child(other_left_child);
+				if (left_child() == &other){
+					other.link_left_child(this);
+					other.link_right_child(this_right_child);
+				}
+				else{
+					other.link_right_child(this);
+					other.link_left_child(this_left_child);
+				}
 				other.set_parent(this_parent);
-				other.set_left_child(this);
-				other.set_right_child(this_right_child);
-			}
-			else if (right_child() == &other)
-			{
 				this->set_parent(&other);
-				this->set_right_child(other_right_child);
-				this->set_left_child(other_left_child);
-				other.set_parent(this_parent);
-				other.set_right_child(this);
-				other.set_left_child(this_left_child);
+				this->link_right_child(other_right_child);
+				this->link_left_child(other_left_child);
 			}
 			else
 			{
 				*(other.parent_branch()) = this;
 				other.set_parent(this_parent);
-				other.set_left_child(this_left_child);
-				other.set_right_child(this_right_child);
+				other.link_left_child(this_left_child);
+				other.link_right_child(this_right_child);
 				this->set_parent(other_parent);
-				this->set_left_child(other_left_child);
-				this->set_right_child(other_right_child);
+				this->link_left_child(other_left_child);
+				this->link_right_child(other_right_child);
 			}
 			this->set_color(other_color);
 			other.set_color(this_color);
-			if (other.left_child())
-				other.left_child()->set_parent(&other);
-			if (other.right_child())
-				other.right_child()->set_parent(&other);
-			if (left_child())
-				left_child()->set_parent(this);
-			if (right_child())
-				right_child()->set_parent(this);
 			return *this;
 		}
 
@@ -169,8 +158,8 @@ namespace ft
 		bool	color() const { return _color; }
 		bool	color(Node* ptr) const { if(ptr) return ptr->_color; return false; }
 		void	set_parent(Node* ptr) { _parent = ptr; }
-		void	set_right_child(Node* ptr) { _right_child = ptr; }
-		void	set_left_child(Node* ptr) { _left_child = ptr; }
+		void	link_right_child(Node* ptr) { _right_child = ptr; if (ptr) ptr->set_parent(this); }
+		void	link_left_child(Node* ptr) { _left_child = ptr; if (ptr) ptr->set_parent(this); }
 		void	set_value(T value) { _value = value; }
 		void	set_color(bool color) { _color = color; }
 		bool	is_right() const { return !is_left(); }
@@ -252,8 +241,7 @@ namespace ft
 
 			*(parent_branch()) = this->left_child();
 			_left_child->_parent = this->parent();
-			_left_child->_right_child = this;
-			this->_parent = this->left_child();
+			left_child()->link_right_child(this);
 			this->_left_child = temp;
 			if (temp)
 				temp->_parent = this;
@@ -265,8 +253,7 @@ namespace ft
 
 			*(parent_branch()) = this->right_child();
 			_right_child->_parent = this->parent();
-			_right_child->_left_child = this;
-			this->_parent = this->right_child();
+			right_child()->link_left_child(this);
 			this->_right_child = temp;
 			if (temp)
 				temp->_parent = this;

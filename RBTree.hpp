@@ -131,7 +131,7 @@ public:
 //////////--------------------- GETTERS & SETTERS--------------------////////////////////
 
 		Node<T>*	root() const { return _root_parent.left_child(); }
-		void		set_root(Node<T>* ptr) { _root_parent.set_left_child(ptr); }
+		void		set_root(Node<T>* ptr) { _root_parent.link_left_child(ptr); }
 		size_t		size() const { return _size; }
 		size_t		confirm_size() const { return root()->size(); }
 		void		set_begin_ptr(){
@@ -178,7 +178,7 @@ public:
 					else if (temp->right_child())
 						temp = temp->right_child();
 					else{
-						temp->set_right_child(_node_alloc.allocate(1));
+						temp->link_right_child(_node_alloc.allocate(1));
 						_node_alloc.construct(temp->right_child(), Node<T>(val));
 						temp->right_child()->set_parent(temp);
 						temp = temp->right_child();
@@ -191,7 +191,7 @@ public:
 					else if (temp->left_child())
 						temp = temp->left_child();
 					else{
-						temp->set_left_child(_node_alloc.allocate(1));
+						temp->link_left_child(_node_alloc.allocate(1));
 						_node_alloc.construct(temp->left_child(), Node<T>(val));
 						temp->left_child()->set_parent(temp);
 						temp = temp->left_child();
@@ -281,8 +281,8 @@ public:
 					temp.pop();
 				}
 			}
-			node.set_right_child(nullptr);
-			node.set_left_child(nullptr);
+			node.link_right_child(nullptr);
+			node.link_left_child(nullptr);
 			_size = root()->size();
 		}
 

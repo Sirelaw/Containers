@@ -162,6 +162,30 @@ int main()
 	temp_int.remove(26);
 	temp_int.remove(70);///
 	temp_int.remove(68);
+	temp_int.remove(18);
+	temp_int.remove(7);
+	temp_int.remove(15);
+	temp_int.remove(16);
+	temp_int.remove(30);
+	temp_int.remove(25);
+	temp_int.remove(40);
+	temp_int.remove(60);
+	temp_int.remove(2);
+	temp_int.remove(1);
+	temp_int.remove(70);
+	temp_int.remove(79);
+	temp_int.remove(18);
+	temp_int.remove(62);
+	temp_int.remove(4);
+	temp_int.remove(42);
+	temp_int.remove(78);
+	temp_int.remove(74);
+	temp_int.remove(47);
+	temp_int.remove(5);
+	temp_int.remove(28);
+	temp_int.remove(80);
+	temp_int.remove(93);
+	temp_int.remove(65);
 
 	// temp.insert("A");
 	// temp.insert("B");
