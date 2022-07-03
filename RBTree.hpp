@@ -136,7 +136,7 @@ public:
 		size_t		confirm_size() const { return root()->size(); }
 		void		set_begin_ptr(){
 			Node<T>*	temp = root();
-			while (temp->left_child()) 
+			while (temp && temp->left_child()) 
 				temp = temp->left_child();
 			_begin_ptr = temp;
 		}
@@ -251,7 +251,6 @@ public:
 		void	remove(T value)
 		{
 			Node<T>*	temp = this->search(value);
-
 			if (temp){
 				delete_single_node(*temp);
 				set_begin_ptr();
@@ -292,8 +291,8 @@ public:
 			int			offspring	= node.count_children();
 			Node<T>*	temp = &node;
 
-			if (offspring == 1)
-				delete_single_node(node.swap_node(node.single_child()));
+			if (offspring == 1){
+				delete_single_node(node.swap_node(node.single_child()));}
 			else if (offspring == 2)
 				delete_single_node(node.swap_node(node.in_order_successor()));
 			else{
@@ -347,6 +346,8 @@ public:
 					temp.pop();
 				}
 			}
+			std::cout << "--------------------" << std::endl;
+
 		}
 
 		void	print_tree_by_level() const
@@ -368,6 +369,7 @@ public:
 				
 				i++;
 			}
+			std::cout << "--------------------" << std::endl;
 		}
 
 //////////------------------------ HELPERS -----------------------////////////////////
@@ -512,60 +514,9 @@ public:
 
 		void	test_node()
 		{
-			// remove(79);
-			// remove(18);
-			// remove("B");
-			// remove("B");
-			// remove("CC");
-			// remove("AA");
-			// remove(78);
-			// remove(28);
-			// remove(35);/////////
-			// remove(81);
-			// remove(99);
-			// remove(74);
-			// remove(47);
-			// remove(5);
-			// remove(80);
-			// remove(93);
-			// remove(65);
-			// remove(33);
-			// remove(69);
-			// remove(37);
-			// remove(71);
-			// remove(36);
-			// remove(20);
-			// remove(95);
-			// remove(48);
-			// remove(21);
-			// remove(63);
-			// remove(73);
-			// remove(3);
-			// remove(16);
-			// remove(7);
-			// remove(9);
-			// remove(94);////
-			// remove(55);
-			// remove(14);
-			// remove(6);
-			// remove(61);
-			// remove(27);/////
-			// remove(89);
-			// remove(49);
-			// remove(66);
-			// remove(82);
 			PRINT("<<<<<--------->>>>>>", GREEN);
-			print_tree_by_level();
-			// remove(26);
-			// remove(70);///
-			// remove(68);
-			// remove(58);
-			// remove(2);
-			// remove(44);
-			// remove(88);
-			// remove(85);
-			// print_tree_in_order();
-			// level_order_transverse();
+			// print_tree_by_level();
+			print_tree_in_order();
 		}
 
 	protected:

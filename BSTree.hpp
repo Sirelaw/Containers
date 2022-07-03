@@ -315,60 +315,8 @@ namespace ft
 
 		void	test_node()
 		{
-			// remove(79);
-			// remove(18);
-			// remove(62);
-			// remove(10);
-			// remove(4);
-			// remove(42);
-			// remove(78);
-			// remove(28);
-			// remove(35);/////////
-			// remove(81);
-			// remove(99);
-			// remove(74);
-			// remove(47);
-			// remove(5);
-			// remove(80);
-			// remove(93);
-			// remove(65);
-			// remove(33);
-			// remove(69);
-			// remove(37);
-			// remove(71);
-			// remove(36);
-			// remove(20);
-			// remove(95);
-			// remove(48);
-			// remove(21);
-			// remove(63);
-			// remove(73);
-			// remove(3);
-			remove(16);
-			// remove(7);
-			// remove(9);
-			// remove(94);////
-			// remove(55);
-			// remove(14);
-			// remove(6);
-			// remove(61);
-			// remove(27);/////
-			// remove(89);
-			// remove(49);
-			// remove(66);
-			// remove(82);
 			PRINT("<<<<<--------->>>>>>", GREEN);
 			print_tree_by_level();
-			// remove(26);
-			// remove(70);///
-			// remove(68);
-			// remove(58);
-			// remove(2);
-			// remove(44);
-			// remove(88);
-			// remove(85);
-			// print_tree_in_order();
-			// level_order_transverse();
 		}
 
 		size_t	size() const { return _size; }

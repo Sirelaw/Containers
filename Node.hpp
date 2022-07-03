@@ -38,19 +38,54 @@ namespace ft
 
 		Node&	swap_node( Node& other)
 		{
-			Node*	temp_parent = other.parent();
-			Node*	temp_left_child = other.left_child();
-			Node*	temp_right_child = other.right_child();
-			bool	temp_color = other.color();
+			Node*	this_parent = this->parent();
+			Node*	this_left_child = this->left_child();
+			Node*	this_right_child = this->right_child();
+			bool	this_color = this->color();
+			Node*	other_parent = other.parent();
+			Node*	other_left_child = other.left_child();
+			Node*	other_right_child = other.right_child();
+			bool	other_color = other.color();
 
-			other.set_color(color());
-			other.set_left_child(left_child());
-			other.set_right_child(right_child());
-			other.set_parent(parent());
-			set_color(temp_color);
-			set_left_child(temp_left_child);
-			set_right_child(temp_right_child);
-			set_parent(temp_parent);
+			*(this->parent_branch()) = &other;
+			if (left_child() == &other)
+			{
+				this->set_parent(&other);
+				this->set_right_child(other_right_child);
+				this->set_left_child(other_left_child);
+				other.set_parent(this_parent);
+				other.set_left_child(this);
+				other.set_right_child(this_right_child);
+			}
+			else if (right_child() == &other)
+			{
+				this->set_parent(&other);
+				this->set_right_child(other_right_child);
+				this->set_left_child(other_left_child);
+				other.set_parent(this_parent);
+				other.set_right_child(this);
+				other.set_left_child(this_left_child);
+			}
+			else
+			{
+				*(other.parent_branch()) = this;
+				other.set_parent(this_parent);
+				other.set_left_child(this_left_child);
+				other.set_right_child(this_right_child);
+				this->set_parent(other_parent);
+				this->set_left_child(other_left_child);
+				this->set_right_child(other_right_child);
+			}
+			this->set_color(other_color);
+			other.set_color(this_color);
+			if (other.left_child())
+				other.left_child()->set_parent(&other);
+			if (other.right_child())
+				other.right_child()->set_parent(&other);
+			if (left_child())
+				left_child()->set_parent(this);
+			if (right_child())
+				right_child()->set_parent(this);
 			return *this;
 		}
 

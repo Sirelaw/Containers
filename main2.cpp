@@ -26,7 +26,8 @@ void	check()
 
 int main()
 {
-	ft::RBTree<std::string, ft::less<std::string>, std::allocator<std::string> >	temp;
+	// ft::RBTree<std::string, ft::less<std::string>, std::allocator<std::string> >	temp;
+	ft::RBTree<int, ft::less<int>, std::allocator<int> >	temp_int;
 	std::map<int, int, ft::less<int> > test_map;
 	ft::vector<std::string> test_vec;
 	ft::vector<int> int_vec;
@@ -50,125 +51,137 @@ int main()
 
 	// ft::Node<int>	test;
 
-	// temp.insert(23);
-	// temp.insert(25);
-	// temp.insert(30);
-	// temp.insert(29);
-	// temp.insert(4);
-	// temp.insert(3);
-	// temp.insert(1);
-	// temp.insert(10);
-	// temp.insert(7);
-	// temp.insert(5);
-	// temp.insert(9);
-	// temp.insert(20);
-	// temp.insert(15);
-	// temp.insert(12);
-	// temp.insert(18);
+	// temp_int.insert(23);
+	// temp_int.insert(25);
+	// temp_int.insert(30);
+	// temp_int.insert(29);
+	// temp_int.insert(4);
+	// temp_int.insert(3);
+	// temp_int.insert(1);
+	// temp_int.insert(10);
+	// temp_int.insert(7);
+	// temp_int.insert(5);
+	// temp_int.insert(9);
+	// temp_int.insert(20);
+	// temp_int.insert(15);
+	// temp_int.insert(12);
+	// temp_int.insert(18);
 
-	// PRINT(temp.size(), BLUE);
+	PRINT(temp_int.size(), BLUE);
 
 
-	// temp.insert(10);
-	// temp.insert(18);
-	// temp.insert(7);
-	// temp.insert(15);
-	// temp.insert(16);
-	// temp.insert(30);
-	// temp.insert(25);
-	// temp.insert(40);
-	// temp.insert(60);
-	// temp.insert(2);
-	// temp.insert(1);
-	// temp.insert(70);
+	temp_int.insert(10);
+	temp_int.insert(18);
+	temp_int.insert(7);
+	temp_int.insert(15);
+	temp_int.insert(16);
+	temp_int.insert(30);
+	temp_int.insert(25);
+	temp_int.insert(40);
+	temp_int.insert(60);
+	temp_int.insert(2);
+	temp_int.insert(1);
+	temp_int.insert(70);
+	temp_int.insert(79);
+	temp_int.insert(18);
+	temp_int.insert(62);
+	temp_int.insert(4);
+	temp_int.insert(42);
+	temp_int.insert(78);
+	temp_int.insert(74);
+	temp_int.insert(47);
+	temp_int.insert(5);
+	temp_int.insert(28);
+	temp_int.insert(80);
+	temp_int.insert(93);
+	temp_int.insert(65);
+	temp_int.insert(33);
+	temp_int.insert(69);
+	temp_int.insert(99);
+	temp_int.insert(37);
+	temp_int.insert(71);
+	temp_int.insert(36);
+	temp_int.insert(20);
+	temp_int.insert(95);
+	temp_int.insert(48);
+	temp_int.insert(21);
+	temp_int.insert(63);
+	temp_int.insert(73);
+	temp_int.insert(3);
+	temp_int.insert(16);
+	temp_int.insert(7);
+	temp_int.insert(9);
+	temp_int.insert(94);////
+	temp_int.insert(55);
+	temp_int.insert(14);
+	temp_int.insert(6);
+	temp_int.insert(61);
+	temp_int.insert(27);/////
+	temp_int.insert(89);
+	temp_int.insert(49);
+	temp_int.insert(66);
+	temp_int.insert(82);
+	temp_int.insert(26);
+	temp_int.insert(70);///
+	temp_int.insert(68);
+	temp_int.insert(81);
+	temp_int.insert(58);
+	temp_int.insert(35);
+	temp_int.insert(2);
+	temp_int.insert(44);
+	temp_int.insert(88);
+	temp_int.insert(85);
+	temp_int.insert(1);
+	temp_int.insert(1);
 
-	// temp.delete_node((temp.root())->search(23));
+	temp_int.remove(10);
+	temp_int.remove(2);
+	temp_int.remove(44);
+	temp_int.remove(88);
+	temp_int.remove(85);
+	temp_int.remove(1);
+	temp_int.remove(1);
+	temp_int.remove(48);
+	temp_int.remove(21);
+	temp_int.remove(63);
+	temp_int.remove(73);
+	temp_int.remove(3);
+	temp_int.remove(16);
+	temp_int.remove(7);
+	temp_int.remove(9);
+	temp_int.remove(94);////
+	temp_int.remove(55);
+	temp_int.remove(14);
+	temp_int.remove(6);
+	temp_int.remove(61);
+	temp_int.remove(27);/////
+	temp_int.remove(89);
+	temp_int.remove(49);
+	temp_int.remove(66);
+	temp_int.remove(82);
+	temp_int.remove(26);
+	temp_int.remove(70);///
+	temp_int.remove(68);
 
-	// temp.insert(79);
-	// temp.insert(18);
-	// temp.insert(62);
-	// temp.insert(10);
-	// temp.insert(4);
-	// temp.insert(42);
-	// temp.insert(78);
-	// temp.insert(74);
-	// temp.insert(47);
-	// temp.insert(5);
-	// temp.insert(28);
-	// temp.insert(80);
-	// temp.insert(93);
-	// temp.insert(65);
-	// temp.insert(33);
-	// temp.insert(69);
-	// temp.insert(99);
-	// temp.insert(37);
-	// temp.insert(71);
-	// temp.insert(36);
-	// temp.insert(20);
-	// temp.insert(95);
-	// temp.insert(48);
-	// temp.insert(21);
-	// temp.insert(63);
-	// temp.insert(73);
-	// temp.insert(3);
-	// temp.insert(16);
-	// temp.insert(7);
-	// temp.insert(9);
-	// temp.insert(94);////
-	// temp.insert(55);
-	// temp.insert(14);
-	// temp.insert(6);
-	// temp.insert(61);
-	// temp.insert(27);/////
-	// temp.insert(89);
-	// temp.insert(49);
-	// temp.insert(66);
-	// temp.insert(82);
-	// temp.insert(26);
-	// temp.insert(70);///
-	// temp.insert(68);
-	// temp.insert(81);
-	// temp.insert(58);
-	// temp.insert(35);
-	// temp.insert(2);
-	// temp.insert(44);
-	// temp.insert(88);
-	// temp.insert(85);
-	// temp.insert(1);
-	// temp.insert(1);
+	// temp.insert("A");
+	// temp.insert("B");
+	// temp.insert("C");
+	// temp.insert("D");
+	// temp.insert("E");
+	// temp.insert("F");
 
-	temp.insert("A");
-	temp.insert("B");
-	temp.insert("C");
-	temp.insert("D");
-	temp.insert("E");
-	temp.insert("F");
+	temp_int.test_node();
+	// temp.test_node();
 
-	temp.test_node();
-
-	// ft::RBTree<std::string>::iterator iter = temp.begin();
+	// for (ft::RBTree<std::string>::const_reverse_iterator iter = temp.crbegin(); iter != temp.crend(); ++iter)
+	// {
 	// 	PRINT(iter->value(), RED);
-	// iter = temp.end();
+	// 	PRINT((iter + 4)->value(), GREEN);
+	// }
+	// for (ft::RBTree<int>::const_reverse_iterator iter = temp_int.crbegin(); iter != temp_int.crend(); ++iter)
+	// {
 	// 	PRINT(iter->value(), RED);
-	// ft::RBTree<std::string>::reverse_iterator r_iter = temp.rbegin();
-	// 	PRINT(r_iter->value(), RED);
-	// r_iter = temp.rend();
-	// 	PRINT(r_iter->value(), RED);
-	// 	PRINT(iter->value(), RED);
-	// r_iter = temp.rend();
-	// 	PRINT(r_iter->value(), RED);
-
-
-	for (ft::RBTree<std::string>::const_reverse_iterator iter = temp.crbegin(); iter != temp.crend(); ++iter)
-	// for (ft::RBTree<std::string>::reverse_iterator iter = temp.rbegin(); iter != temp.rend(); ++iter)
-	// for (ft::RBTree<std::string>::iterator iter = temp.begin(); iter != temp.end(); ++iter)
-	// for (ft::RBTree<std::string>::const_iterator iter = temp.cbegin(); iter != temp.cend(); ++iter)
-	{
-		PRINT(iter->value(), RED);
-		PRINT((iter + 4)->value(), GREEN);
-		// std::cout << RED << iter->value() << RESET << std::endl;
-		// std::cout << GREEN << (iter + 4)->value() << RESET << std::endl;
-	}
+	// }
 	// PRINT(temp.size(), GREEN);
 	// PRINT(temp.confirm_size(), GREEN);
 	// atexit(check);
