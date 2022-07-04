@@ -95,14 +95,14 @@ int main()
 	temp_int.insert(80);
 	temp_int.insert(93);
 	temp_int.insert(65);
-	temp_int.insert(33);
-	temp_int.insert(69);
-	temp_int.insert(99);
-	temp_int.insert(37);
-	temp_int.insert(71);
-	temp_int.insert(36);
-	temp_int.insert(20);
-	temp_int.insert(95);
+	// temp_int.insert(33);
+	// temp_int.insert(69);
+	// temp_int.insert(99);
+	// temp_int.insert(37);
+	// temp_int.insert(71);
+	// temp_int.insert(36);
+	// temp_int.insert(20);
+	// temp_int.insert(95);
 	temp_int.insert(48);
 	temp_int.insert(21);
 	temp_int.insert(63);
@@ -124,9 +124,9 @@ int main()
 	temp_int.insert(26);
 	temp_int.insert(70);///
 	temp_int.insert(68);
-	temp_int.insert(81);
-	temp_int.insert(58);
-	temp_int.insert(35);
+	// temp_int.insert(81);
+	// temp_int.insert(58);
+	// temp_int.insert(35);
 	temp_int.insert(2);
 	temp_int.insert(44);
 	temp_int.insert(88);
@@ -208,7 +208,7 @@ int main()
 	// }
 	// PRINT(temp.size(), GREEN);
 	// PRINT(temp.confirm_size(), GREEN);
-	// atexit(check);
+	atexit(check);
 	return (0);
 }
 

@@ -16,10 +16,10 @@ namespace ft
 	public:
 		typedef T														value_type;
 		typedef Node<T>													node_type;
-		typedef Node<T>*												pointer;
-		typedef	const Node<T>*											const_pointer;
-		typedef Node<T>&												reference;
-		typedef	const Node<T>& 											const_reference;
+		typedef node_type*												pointer;
+		typedef	const pointer											const_pointer;
+		typedef node_type&												reference;
+		typedef	const node_type& 										const_reference;
 		typedef	std::ptrdiff_t											difference_type;
 		typedef	bidirectional_iterator_tag								iterator_category;
 
@@ -27,11 +27,11 @@ namespace ft
 	
 
 	public:
-		treeIterator(Node<T>* ptr = nullptr) : _ptr(ptr)				{ }
+		treeIterator(pointer ptr = nullptr) : _ptr(ptr)				{ }
 		treeIterator(const treeIterator& other) : _ptr(other.getPtr())	{ }
 		~treeIterator(){}
 
-		Node<T>*	next_node(Node<T>* ptr)
+		pointer	next_node(pointer ptr)
 		{
 			if (!ptr->parent())
 			{
@@ -48,7 +48,7 @@ namespace ft
 			return ptr->parent();
 		}
 
-		Node<T>*	prev_node(Node<T>* ptr)
+		pointer	prev_node(pointer ptr)
 		{
 			if (ptr->left_child())
 				return (&(ptr->in_order_predecessor()));
@@ -101,13 +101,13 @@ namespace ft
 
 		Node<T>&										operator*(){ return *_ptr; }
 		const Node<T>&								operator*() const { return *_ptr; }
-		Node<T>*										operator->() const { return _ptr; }
+		pointer										operator->() const { return _ptr; }
 
-		Node<T>*										getPtr() const { return _ptr; }
-		const Node<T>*								getConstPtr() const { return _ptr; }
+		pointer										getPtr() const { return _ptr; }
+		const pointer								getConstPtr() const { return _ptr; }
 
 	protected:
-		Node<T>*	_ptr;
+		pointer	_ptr;
 	};
 
 		//------------------------ Const Iterator ------------------------------------------//
@@ -117,10 +117,10 @@ namespace ft
 	public:
 		typedef T														value_type;
 		typedef Node<T>													node_type;
-		typedef const Node<T>*											pointer;
-		typedef	const Node<T>*											const_pointer;
-		typedef const Node<T>&											reference;
-		typedef	const Node<T>& 											const_reference;
+		typedef const node_type*										const_pointer;
+		typedef	const_pointer											pointer;
+		typedef	const node_type& 										const_reference;
+		typedef const_reference											reference;
 		typedef	std::ptrdiff_t											difference_type;
 		typedef	bidirectional_iterator_tag								iterator_category;
 
@@ -128,11 +128,11 @@ namespace ft
 	
 
 	public:
-		const_treeIterator(const Node<T>* ptr = nullptr)	: _ptr(ptr)		{ }
+		const_treeIterator(const pointer ptr = nullptr)	: _ptr(ptr)		{ }
 		const_treeIterator(const const_treeIterator& other) : _ptr(other.getPtr())	{ } /////////
 		~const_treeIterator(){}
 
-		const Node<T>*	next_node(const Node<T>* ptr)
+		const pointer	next_node(const pointer ptr)
 		{
 			if (!ptr->parent())
 			{
@@ -149,7 +149,7 @@ namespace ft
 			return ptr->parent();
 		}
 
-		const Node<T>*	prev_node(const Node<T>* ptr)
+		const pointer	prev_node(const pointer ptr)
 		{
 			if (ptr->left_child())
 				return (ptr->left_child()->maximum());
@@ -202,13 +202,13 @@ namespace ft
 
 		// Node<T>&										operator*(){ return *_ptr; }
 		// Node<const T>&								operator*() const { return *_ptr; }
-		const Node<T>*										operator->() const { return _ptr; }
+		const pointer										operator->() const { return _ptr; }
 
-		const Node<T>*										getPtr() const { return _ptr; }
-		const Node<T>*								getConstPtr() const { return _ptr; }
+		const pointer										getPtr() const { return _ptr; }
+		const pointer								getConstPtr() const { return _ptr; }
 
 	protected:
-		const Node<T>*	_ptr;
+		const pointer	_ptr;
 	};
 
 	//-----------------------------------------------------------------------------//
