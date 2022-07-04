@@ -70,28 +70,28 @@ namespace ft
 		bool									operator>(const treeIterator& rawIterator)const{return (_ptr->value() > rawIterator.getConstPtr()->value()); }
 		bool									operator>=(const treeIterator& rawIterator)const{return (_ptr->value() >= rawIterator.getConstPtr()->value()); }
 
-		treeIterator<T>&							operator+=(const difference_type& movement) {
+		treeIterator&							operator+=(const difference_type& movement) {
 			difference_type temp = movement;
 			while (temp--)
 				_ptr = next_node(_ptr); 
 			return (*this);
 		}
-		treeIterator<T>&							operator-=(const difference_type& movement) {
+		treeIterator&							operator-=(const difference_type& movement) {
 			difference_type temp = movement;
 			while (temp--)
 				_ptr = prev_node(_ptr); 
 			return (*this);
 		}
-		treeIterator<T>&							operator++() { _ptr = next_node(_ptr); return (*this); }
-		treeIterator<T>&							operator--() { _ptr = prev_node(_ptr); return (*this); }
-		treeIterator<T>							operator++(int) {treeIterator<T> temp(*this); _ptr = next_node(_ptr); return (temp); }
-		treeIterator<T>							operator--(int) {treeIterator<T> temp(*this); _ptr = prev_node(_ptr); return (temp); }
-		treeIterator<T>							operator+(const difference_type& movement) const { treeIterator<T> temp(*this); temp += movement; return (temp); }
-		treeIterator<T>							operator-(const difference_type& movement) const { treeIterator<T> temp(*this); temp -= movement; return (temp); }
+		treeIterator&							operator++() { _ptr = next_node(_ptr); return (*this); }
+		treeIterator&							operator--() { _ptr = prev_node(_ptr); return (*this); }
+		treeIterator							operator++(int) {treeIterator temp(*this); _ptr = next_node(_ptr); return (temp); }
+		treeIterator							operator--(int) {treeIterator temp(*this); _ptr = prev_node(_ptr); return (temp); }
+		treeIterator							operator+(const difference_type& movement) const { treeIterator temp(*this); temp += movement; return (temp); }
+		treeIterator							operator-(const difference_type& movement) const { treeIterator temp(*this); temp -= movement; return (temp); }
 
-		difference_type							operator-(const treeIterator<T>& rawIterator) const {
+		difference_type							operator-(const treeIterator& rawIterator) const {
 			difference_type		temp = 0;
-			treeIterator<T>		temp_iter(*this);
+			treeIterator		temp_iter(*this);
 			while (temp_iter.getConstPtr() != rawIterator.getConstPtr()){
 				++temp_iter;
 				++temp;
@@ -99,12 +99,12 @@ namespace ft
 			return (temp);
 		}
 
-		Node<T>&										operator*(){ return *_ptr; }
-		const Node<T>&								operator*() const { return *_ptr; }
-		pointer										operator->() const { return _ptr; }
+		node_type&										operator*(){ return *_ptr; }
+		const node_type&								operator*() const { return *_ptr; }
+		pointer											operator->() const { return _ptr; }
 
-		pointer										getPtr() const { return _ptr; }
-		const pointer								getConstPtr() const { return _ptr; }
+		pointer											getPtr() const { return _ptr; }
+		const pointer									getConstPtr() const { return _ptr; }
 
 	protected:
 		pointer	_ptr;
@@ -132,7 +132,7 @@ namespace ft
 		const_treeIterator(const const_treeIterator& other) : _ptr(other.getPtr())	{ } /////////
 		~const_treeIterator(){}
 
-		const pointer	next_node(const pointer ptr)
+		const pointer	next_node(pointer ptr)
 		{
 			if (!ptr->parent())
 			{
@@ -149,7 +149,7 @@ namespace ft
 			return ptr->parent();
 		}
 
-		const pointer	prev_node(const pointer ptr)
+		const pointer	prev_node(pointer ptr)
 		{
 			if (ptr->left_child())
 				return (ptr->left_child()->maximum());
@@ -200,15 +200,14 @@ namespace ft
 			return (temp);
 		}
 
-		// Node<T>&										operator*(){ return *_ptr; }
-		// Node<const T>&								operator*() const { return *_ptr; }
+		const node_type&								operator*() const { return *_ptr; }
 		const pointer										operator->() const { return _ptr; }
 
 		const pointer										getPtr() const { return _ptr; }
 		const pointer								getConstPtr() const { return _ptr; }
 
 	protected:
-		const pointer	_ptr;
+		pointer	_ptr;
 	};
 
 	//-----------------------------------------------------------------------------//

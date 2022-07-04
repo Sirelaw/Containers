@@ -26,8 +26,9 @@ void	check()
 
 int main()
 {
-	// ft::RBTree<std::string, ft::less<std::string>, std::allocator<std::string> >	temp;
+	ft::RBTree<std::string, ft::less<std::string>, std::allocator<std::string> >	temp;
 	ft::RBTree<int, ft::less<int>, std::allocator<int> >	temp_int;
+	ft::RBTree<int, ft::less<int>, std::allocator<int> >	temp_int2;
 	std::map<int, int, ft::less<int> > test_map;
 	ft::vector<std::string> test_vec;
 	ft::vector<int> int_vec;
@@ -66,8 +67,6 @@ int main()
 	// temp_int.insert(15);
 	// temp_int.insert(12);
 	// temp_int.insert(18);
-
-	PRINT(temp_int.size(), BLUE);
 
 
 	temp_int.insert(10);
@@ -152,79 +151,70 @@ int main()
 	temp_int.remove(94);////
 	temp_int.remove(55);
 	temp_int.remove(14);
-	temp_int.remove(6);
-	temp_int.remove(61);
-	temp_int.remove(27);/////
-	temp_int.remove(89);
-	temp_int.remove(49);
-	temp_int.remove(66);
-	temp_int.remove(82);
-	temp_int.remove(26);
-	temp_int.remove(70);///
-	temp_int.remove(68);
-	temp_int.remove(18);
-	temp_int.remove(7);
-	temp_int.remove(15);
-	temp_int.remove(16);
-	temp_int.remove(30);
-	temp_int.remove(25);
-	temp_int.remove(40);
-	temp_int.remove(60);
-	temp_int.remove(2);
-	temp_int.remove(1);
-	temp_int.remove(70);
-	temp_int.remove(79);
-	temp_int.remove(18);
-	temp_int.remove(62);
 	temp_int.remove(4);
-	temp_int.remove(42);
-	temp_int.remove(78);
-	temp_int.remove(74);
-	temp_int.remove(47);
-	temp_int.remove(5);
-	temp_int.remove(28);
-	temp_int.remove(80);
-	temp_int.remove(93);
-	temp_int.remove(65);
+	temp_int.insert(4);
+	// temp_int.remove(6);
+	// temp_int.remove(61);
+	// temp_int.remove(27);/////
+	// temp_int.remove(89);
+	// temp_int.remove(49);
+	// temp_int.remove(66);
+	// temp_int.remove(82);
+	// temp_int.remove(26);
+	// temp_int.remove(70);///
+	// temp_int.remove(68);
+	// temp_int.remove(18);
+	// temp_int.remove(7);
+	// temp_int.remove(15);
+	// temp_int.remove(16);
+	// temp_int.remove(30);
+	// temp_int.remove(25);
+	// temp_int.remove(40);
+	// temp_int.remove(60);
+	// temp_int.remove(2);
+	// temp_int.remove(1);
+	// temp_int.remove(70);
+	// temp_int.remove(79);
+	// temp_int.remove(18);
+	// temp_int.remove(62);
+	// temp_int.remove(42);
+	// temp_int.remove(78);
+	// temp_int.remove(74);
+	// temp_int.remove(47);
+	// temp_int.remove(5);
+	// temp_int.remove(28);
+	// temp_int.remove(80);
+	// temp_int.remove(93);
+	// temp_int.remove(65);
 
-	// temp.insert("A");
-	// temp.insert("B");
-	// temp.insert("C");
-	// temp.insert("D");
-	// temp.insert("E");
-	// temp.insert("F");
+	temp.insert("A");
+	temp.insert("B");
+	temp.insert("C");
+	temp.insert("D");
+	temp.insert("E");
+	temp.insert("F");
 
 	temp_int.test_node();
-	// temp.test_node();
+	temp.test_node();
 
-	// for (ft::RBTree<std::string>::const_reverse_iterator iter = temp.crbegin(); iter != temp.crend(); ++iter)
-	// {
-	// 	PRINT(iter->value(), RED);
-	// 	PRINT((iter + 4)->value(), GREEN);
-	// }
+	temp_int2 = temp_int;
+	temp_int2.test_node();
+
+	for (ft::RBTree<std::string>::const_iterator iter = temp.cbegin(); iter != temp.cend(); ++iter)
+	// for (ft::RBTree<std::string>::iterator iter = temp.begin(); iter != temp.end(); ++iter)
+	{
+		PRINT(iter->value(), RED);
+		PRINT((iter + 4)->value(), GREEN);
+	}
 	// for (ft::RBTree<int>::const_reverse_iterator iter = temp_int.crbegin(); iter != temp_int.crend(); ++iter)
 	// {
 	// 	PRINT(iter->value(), RED);
 	// }
-	// PRINT(temp.size(), GREEN);
-	// PRINT(temp.confirm_size(), GREEN);
+	// PRINT(temp_int.size(), GREEN);
+	// PRINT(temp_int.confirm_size(), GREEN);
 	atexit(check);
 	return (0);
 }
-
-
-// iterator_traits example
-// #include <iostream>     // std::cout
-// #include <iterator>     // std::iterator_traits
-// #include <typeinfo>     // typeid
-
-// int main() {
-//   typedef ft::iterator_traits<int*> traits;
-//   if (typeid(traits::iterator_category)==typeid(std::random_access_iterator_tag))
-//     std::cout << "int* is a random-access iterator";
-//   return 0;
-// }
-
 
 
 

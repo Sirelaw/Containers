@@ -16,59 +16,73 @@ namespace ft
 	{
 		typedef Key															key_type;
 		typedef T															mapped_type;
-		typedef pair<const key_type, T>										value_type;
-		typedef Node<value_type>											node_type;
-		typedef std::size_t													size_type;
-		typedef std::ptrdiff_t												difference_type;
+		typedef pair<const key_type, mapped_type>							value_type;
+
+		struct value_compare : binary_function<value_type, value_type, bool>
+		{
+			bool	operator()( const value_type& lhs, const value_type& rhs ) const
+			{
+				return (Compare()(lhs.first, rhs.first));
+			}
+		};
+
 		typedef Compare														key_compare;
 		typedef Allocator													allocator_type;
-		typedef value_type&													reference;
-		typedef const value_type&											const_reference;
-		typedef typename Allocator::pointer									pointer;
-		typedef typename Allocator::const_pointer							const_pointer;
-		typedef RBTree<value_type, value_compare<Key, Compare>, Allocator>	tree_type;
+		typedef RBTree<value_type, value_compare, Allocator>				tree_type;
+		typedef typename tree_type::node_type								node_type;
 
 		//------------------ Iterator_tags ------------------------------------------//
-
-		typedef	bidirectional_iterator_tag									iterator_category;
-		typedef typename treeIterator<value_type>::pointer					iterator;
-		typedef typename const_treeIterator<value_type>::pointer			const_iterator;
-		typedef typename ft::reverse_iterator<iterator>						reverse_iterator;
-		typedef	typename ft::reverse_iterator<const_iterator>				const_reverse_iterator;
+	public:
+		typedef typename tree_type::pointer									pointer;
+		typedef typename tree_type::reference								reference;
+		typedef typename tree_type::const_reference							const_reference;
+		typedef typename tree_type::iterator								iterator;
+		typedef typename tree_type::const_iterator							const_iterator;
+		typedef typename tree_type::reverse_iterator						reverse_iterator;
+		typedef typename tree_type::const_reverse_iterator					const_reverse_iterator;
+		typedef typename tree_type::size_type								size_type;
+		typedef typename tree_type::difference_type							difference_type;
 
 		//----------------------- extras ------------------------------------------//
 
-		// typedef typename template <class Iter, class NodeType>
-		// struct insert_type {
-		// 	Iter		position;
-		// 	bool		inserted;
-		// 		NodeType 	node;
-		// } insert_return_type;
-
 	public:
-		map() { make_pair('c', 1); }
+		map() { }
 		map(const map& other) { _tree = other._tree; }
 		template< class InputIt >
-		map( InputIt first, InputIt last, const Compare& comp = Compare(),
-			const Allocator& alloc = Allocator() ) : _alloc(alloc), _value_compare(comp)
+		map( InputIt first, InputIt last, const Compare& comp = Compare(), // need to pass this allocator
+			const Allocator& alloc = Allocator() ) : _alloc(alloc), _value_compare(comp) // to the tree
 		{
 			for (iterator temp = first; temp != last; ++temp)
 				_tree.insert(*temp);
 		}
 		~map() {};
-		map& operator=(const map& to_assign)
+		map& operator=(const map& other)
 		{
-			if (this != &to_assign)
-			{
-				
-			}
+			_tree = other._tree;
 			return (*this);
 		}
+		allocator_type	get_allocator() { return _alloc; }
+		T& at(const Key& key)
+		{ 
+			node_type*	temp = _tree.search(key);
+
+			if (!temp)
+				throw std::out_of_range("ft::map::out_of_range");
+			return (temp->value().second);
+		};
+		const T& at(const Key& key) const
+		{ 
+			const node_type*	temp = _tree.search(key);
+
+			if (!temp)
+				throw std::out_of_range("ft::map::out_of_range");
+			return (temp->value().second);
+		};
 
 	private:
-		Allocator	_alloc;
-		Compare		_value_compare;
-		tree_type	_tree;
+		Allocator			_alloc;
+		value_compare		_value_compare;
+		tree_type			_tree;
 
 	};
 }
