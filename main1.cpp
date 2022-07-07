@@ -42,6 +42,7 @@ int main()
         std::cout << "std " << (rits == rits2) << " (==) ft " << (rit == rit2) << std::endl;
         std::cout << "Reverse iterator is inaccurate after push_back\n" << std::endl;
     }
+
     ft::vector<int> ft_second;
     ft::vector<int> ft_second2;
     ft_second.push_back(1);
@@ -50,19 +51,6 @@ int main()
     std::vector<int> std_second2;
     std_second.push_back(1);
     std_second2.push_back(1);
-
-
-
-
-	for(ft::vector<int>::iterator iter = ft_first.begin(); iter < ft_first.end(); ++iter )
-	{
-		std::cout << "ft:\t" << *iter << std::endl;
-	}
-
-	for(std::vector<int>::iterator iter = std_first.begin(); iter < std_first.end(); ++iter )
-	{
-		std::cout << "std:\t" << *iter << std::endl;
-	}
 
     ft::vector<int>::iterator it = ft_second.begin();
     ft::vector<int>::iterator it2 = ft_second2.begin();

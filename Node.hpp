@@ -22,7 +22,8 @@ namespace ft
 	public:
 		Node(T value = T(), Node* parent = nullptr, Node* right_child = nullptr, Node* left_child = nullptr)
 			: _parent(parent), _right_child(right_child), _left_child(left_child), _value(value), _color(true) {}
-		Node(const Node& to_copy) { *this = to_copy; }
+		Node(const Node& other) : _parent(other.parent()), _right_child(other.right_child()),
+									_left_child(other.left_child()) , _value(other.value()), _color(other.color()) { }
 		~Node() { }
 
 		Node& operator=(const Node& to_assign) { 
@@ -147,23 +148,24 @@ namespace ft
 			return count;
 		}
 
-		bool 	is_leaf() const { return !right_child() && !left_child(); }
-		bool	is_red() const {return _color; }
-		bool	is_black() const {return !_color; }
-		int		count_children() const { return ((bool) right_child() + (bool) left_child()); }
-		Node*	parent() const { return _parent; }
-		Node*	right_child() const { return _right_child; }
-		Node*	left_child() const { return _left_child; }
-		T		value() const { return _value; }
-		bool	color() const { return _color; }
-		bool	color(Node* ptr) const { if(ptr) return ptr->_color; return false; }
-		void	set_parent(Node* ptr) { _parent = ptr; }
-		void	link_right_child(Node* ptr) { _right_child = ptr; if (ptr) ptr->set_parent(this); }
-		void	link_left_child(Node* ptr) { _left_child = ptr; if (ptr) ptr->set_parent(this); }
-		void	set_value(T value) { _value = value; }
-		void	set_color(bool color) { _color = color; }
-		bool	is_right() const { return !is_left(); }
-		bool	is_left() const
+		bool 		is_leaf() const { return !right_child() && !left_child(); }
+		bool		is_red() const {return _color; }
+		bool		is_black() const {return !_color; }
+		int			count_children() const { return ((bool) right_child() + (bool) left_child()); }
+		Node*		parent() const { return _parent; }
+		Node*		right_child() const { return _right_child; }
+		Node*		left_child() const { return _left_child; }
+		T&			value() { return _value; }
+		const T&	value() const { return _value; }
+		bool		color() const { return _color; }
+		bool		color(Node* ptr) const { if(ptr) return ptr->_color; return false; }
+		void		set_parent(Node* ptr) { _parent = ptr; }
+		void		link_right_child(Node* ptr) { _right_child = ptr; if (ptr) ptr->set_parent(this); }
+		void		link_left_child(Node* ptr) { _left_child = ptr; if (ptr) ptr->set_parent(this); }
+		void		set_value(T value) { _value = value; }
+		void		set_color(bool color) { _color = color; }
+		bool		is_right() const { return !is_left(); }
+		bool		is_left() const
 		{
 			if (_parent->left_child() == this)
 				return true;

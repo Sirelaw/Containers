@@ -26,22 +26,23 @@ namespace ft
 	class RBTree
 	{	
 	public:
-		typedef T														value_type;
-		typedef Compare													value_compare;
-		typedef Allocator												allocator_type;
-	private:
-		typedef std::allocator_traits<allocator_type>					alloc_traits;
-		typedef Node<T>													node_type;
+		typedef T															value_type;
+		typedef Compare														value_compare;
+		typedef Allocator													allocator_type;
+		typedef Node<T>														node_type;
+	private:	
+		typedef std::allocator_traits<allocator_type>						alloc_traits;
 
-	public:
-		typedef typename Allocator::template rebind< node_type >::other	node_allocator;
-		typedef node_type*												node_pointer;
-		typedef typename Allocator::pointer         					pointer;
-    	typedef typename Allocator::const_pointer  						const_pointer;
-		typedef typename Allocator::reference         					reference;
-    	typedef typename Allocator::const_reference  					const_reference;
-    	typedef typename Allocator::size_type       					size_type;
-    	typedef typename Allocator::difference_type						difference_type;
+	public:	
+		typedef typename Allocator::template rebind< node_type >::other		node_allocator;
+		typedef typename Allocator::template rebind< value_type >::other	value_allocator;
+		typedef node_type*													node_pointer;
+		typedef typename Allocator::pointer         						pointer;
+    	typedef typename Allocator::const_pointer  							const_pointer;
+		typedef typename Allocator::reference         						reference;
+    	typedef typename Allocator::const_reference  						const_reference;
+    	typedef typename Allocator::size_type       						size_type;
+    	typedef typename Allocator::difference_type							difference_type;
 
 //////////-------------------------- ITERATORS ----------------------////////////////////
 	
@@ -85,21 +86,19 @@ public:
 		}
 
 		~RBTree(){
-			if (root()){
-				destroy_children(*(root()));
-				delete_single_node(*(root()));
-			}
+			this->clear();
 		}
 
 //////////--------------------- GETTERS & SETTERS--------------------////////////////////
-
+private:
 		node_type*	root() const { return _root_parent.left_child(); }
 		void		set_root(node_type* ptr) { _root_parent.link_left_child(ptr); }
+public:
 		size_t		size() const { return _size; }
 		size_t		confirm_size() const { return root()->size(); }
 
 //////////-------------------------- INSERT ------------------------////////////////////
-
+private:
 		insert_return_type	new_insert(const T& val)
 		{
 			_size++;
@@ -154,7 +153,7 @@ public:
 			}
 			return ft::make_pair(iterator(temp), true);
 		}
-
+public:
 		insert_return_type	insert(const T& val)
 		{
 			insert_return_type	inserted = new_insert(val);
@@ -192,6 +191,33 @@ public:
 		}
 
 //////////-------------------------- DELETE ------------------------////////////////////
+public:
+		void		clear()
+		{
+			if (!root())
+				return ;
+			for(iterator iter = begin(), temp; iter != end();)
+			{
+				temp = iter + 1;
+				_node_alloc.destroy(iter);
+				_node_alloc.deallocate(iter, 1);
+				iter = temp;
+			}
+			_size = 0;
+			set_root(nullptr);
+		}
+		void		erase(iterator pos)
+		{
+			if (pos)
+			{
+				if (pos == iterator(_begin_ptr))
+					_begin_ptr = _begin_ptr->parent();
+				delete_single_node(**pos);
+				this->_size--;
+			}
+		}
+public:
+
 
 		void	remove(node_type& node)
 		{
@@ -204,7 +230,6 @@ public:
 		void	remove(T value)
 		{
 			node_type*	temp = this->search(value);
-			bool		revalidate_begin_ptr = false;
 
 			if (temp){
 				if (temp == _begin_ptr)
@@ -213,35 +238,7 @@ public:
 				this->_size--;
 			}
 		}
-
-		void	destroy_children(node_type& node)
-		{
-			stack<node_type*>		temp;
-			node_type*			current = &node;
-
-			while (current || !(temp.empty()))
-			{
-				while (current)
-				{
-					temp.push(current);
-					current = current->left_child();
-				}
-				while (!(temp.empty()) && !current)
-				{
-					current = temp.top()->right_child();
-					if (temp.top() != &node)
-					{
-						_node_alloc.destroy(temp.top());
-						_node_alloc.deallocate(temp.top(), 1);
-					}
-					temp.pop();
-				}
-			}
-			node.link_right_child(nullptr);
-			node.link_left_child(nullptr);
-			_size = root()->size();
-		}
-
+private:
 		void	delete_single_node(node_type& node)
 		{
 			int			offspring	= node.count_children();
@@ -255,12 +252,13 @@ public:
 				resolve_double_black(node);
 				*(node.parent_branch()) = nullptr;
 				this->_node_alloc.destroy(temp);
+				this->_value_alloc.destroy(&(temp->value()));
 				this->_node_alloc.deallocate(temp, 1);
 			}
 		}
 
 //////////------------------------ TRANSVERSE-----------------------////////////////////
-
+public:
 		void	level_order_transverse() 
 		{
 			vector<node_type*>	ptr_vec;
@@ -295,9 +293,33 @@ public:
 				}
 				while (!(temp.empty()) && !current)
 				{
-					// std::cout << " ->" << temp.top()->value() << " bf: " << temp.top()->balance_factor();
 					std::cout << " ->" << temp.top()->value() << "\t(" << temp.top()->color() << ", " 
 						<< temp.top()->balance_factor() << ", " << temp.top()->parent()->value() << ")" << std::endl;
+					current = temp.top()->right_child();
+					temp.pop();
+				}
+			}
+			std::cout << "--------------------" << std::endl;
+
+		}
+
+		void	print_map_tree_in_order() const
+		{
+			stack<const node_type*>	temp;
+			const node_type*			current = root();
+
+			while (current || !(temp.empty()))
+			{
+				while (current)
+				{
+					temp.push(current);
+					current = current->left_child();
+				}
+				while (!(temp.empty()) && !current)
+				{
+					std::cout << " ->" << temp.top()->value().first
+							<< " : " << temp.top()->value().second << "\t(" << temp.top()->color() << ", " 
+						<< temp.top()->balance_factor() << ", " << temp.top()->parent()->value().first << ")" << std::endl;
 					current = temp.top()->right_child();
 					temp.pop();
 				}
@@ -328,7 +350,51 @@ public:
 			std::cout << "--------------------" << std::endl;
 		}
 
+		void	print_tree_map_by_level() const
+		{
+			vector<node_type*>	ptr_vec;
+			size_t					i = 0;
+
+			if (!root())
+				return;
+			ptr_vec.push_back(root());
+			while (ptr_vec.size() > i)
+			{
+				std::cout << " ->" << ptr_vec[i]->value().first
+							<< " : " << ptr_vec[i]->value().second << "\t(" << ptr_vec[i]->color() << ", " << ptr_vec[i]->balance_factor() << ", " 
+							<< ptr_vec[i]->parent()->value().first << ")" << std::endl;
+				if (ptr_vec[i]->left_child())
+					ptr_vec.push_back(ptr_vec[i]->left_child());
+				if ((ptr_vec[i]->right_child()))
+					ptr_vec.push_back(ptr_vec[i]->right_child());
+				
+				i++;
+			}
+			std::cout << "--------------------" << std::endl;
+		}
+
 //////////------------------------ HELPERS -----------------------////////////////////
+
+		template<class U>
+		struct	key_equals : binary_function<value_type, U, bool>
+		{
+			bool	operator()(value_type lhs, U rhs) { return lhs.first == rhs; }
+		};
+
+		template <class U>
+		iterator	find_equal(U key)
+		{
+			node_type*	node = root();
+
+			while (node != nullptr && !key_equals<U>()(node->value(), key))
+			{
+				if (key < node->value().first)
+					node = node->left_child();
+				else
+					node = node->right_child();
+			}
+			return iterator(node);
+		}
 
 		node_type*	search(const T& value)
 		{
@@ -357,7 +423,7 @@ public:
 			}
 			return node;
 		}
-
+private:
 		int		determine_setup(node_type& node)
 		{
 			if (node.parent()->is_left() && node.is_left())
@@ -481,18 +547,26 @@ public:
 			return 0;
 		}
 //////////------------------------ TESTING -----------------------////////////////////
-
+public :
 		void	test_node()
 		{
 			PRINT("<<<<<--------->>>>>>", GREEN);
-			// print_tree_by_level();
+			print_tree_by_level();
 			print_tree_in_order();
+		}
+
+		void	test_map()
+		{
+			PRINT("<<<<<--------->>>>>>", GREEN);
+			print_tree_map_by_level();
+			print_map_tree_in_order();
 		}
 
 	protected:
 		node_type						_root_parent;
 		node_type*						_begin_ptr;
 		size_t							_size;
+		value_allocator					_value_alloc;
 		node_allocator					_node_alloc;
 	};
 

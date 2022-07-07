@@ -200,12 +200,32 @@ int main()
 	temp_int2 = temp_int;
 	temp_int2.test_node();
 
-	for (ft::RBTree<std::string>::const_iterator iter = temp.cbegin(); iter != temp.cend(); ++iter)
-	// for (ft::RBTree<std::string>::iterator iter = temp.begin(); iter != temp.end(); ++iter)
+	PRINT("-----------", RED);
+	for (ft::RBTree<std::string>::iterator iter = temp.begin(); iter != temp.end(); ++iter)
 	{
 		PRINT(iter->value(), RED);
 		PRINT((iter + 4)->value(), GREEN);
 	}
+	PRINT("-----------", RED);
+	for (ft::RBTree<std::string>::const_iterator iter = temp.cbegin(); iter != temp.cend(); ++iter)
+	{
+		PRINT(iter->value(), RED);
+		PRINT((iter + 4)->value(), GREEN);
+	}
+	PRINT("-----------", RED);
+	for (ft::RBTree<std::string>::reverse_iterator iter = temp.rbegin(); iter != temp.rend(); ++iter)
+	{
+		PRINT(iter->value(), RED);
+		PRINT((iter + 4)->value(), GREEN);
+	}
+	PRINT("-----------", RED);
+	for (ft::RBTree<std::string>::const_reverse_iterator iter = temp.crbegin(); iter != temp.crend(); ++iter)
+	{
+		PRINT(iter->value(), RED);
+		PRINT((iter + 4)->value(), GREEN);
+	}
+	PRINT("-----------", RED);
+
 	// for (ft::RBTree<int>::const_reverse_iterator iter = temp_int.crbegin(); iter != temp_int.crend(); ++iter)
 	// {
 	// 	PRINT(iter->value(), RED);

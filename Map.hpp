@@ -5,7 +5,7 @@
 #include <string>
 #include "Pair.hpp"
 #include "RBTree.hpp"
-#include "TreeIterator.hpp"
+// #include "MapIterator.hpp"
 #include "IteratorTraits.hpp"
 
 namespace ft
@@ -31,7 +31,7 @@ namespace ft
 		typedef RBTree<value_type, value_compare, Allocator>				tree_type;
 		typedef typename tree_type::node_type								node_type;
 
-		//------------------ Iterator_tags ------------------------------------------//
+		//------------------ tree_tags ------------------------------------------//
 	public:
 		typedef typename tree_type::pointer									pointer;
 		typedef typename tree_type::reference								reference;
@@ -41,7 +41,18 @@ namespace ft
 		typedef typename tree_type::reverse_iterator						reverse_iterator;
 		typedef typename tree_type::const_reverse_iterator					const_reverse_iterator;
 		typedef typename tree_type::size_type								size_type;
+		typedef typename tree_type::insert_return_type						insert_return_type;
 		typedef typename tree_type::difference_type							difference_type;
+	
+	public:
+		iterator								begin(){ return _tree.begin(); }
+		iterator								end(){ return _tree.end(); }
+		const_iterator							cbegin() const { return _tree.cbegin(); }
+		const_iterator							cend() const { return _tree.cend(); }
+		reverse_iterator						rbegin(){ return _tree.rbegin(); }
+		reverse_iterator						rend(){ return _tree.rend(); }
+		const_reverse_iterator					crbegin() const { return _tree.crbegin(); }
+		const_reverse_iterator					crend() const { return _tree.crend(); }
 
 		//----------------------- extras ------------------------------------------//
 
@@ -61,23 +72,74 @@ namespace ft
 			_tree = other._tree;
 			return (*this);
 		}
+
 		allocator_type	get_allocator() { return _alloc; }
-		T& at(const Key& key)
+		
+		void	testpoint()
+		{
+			_tree.test_map();
+			clear();
+			PRINT(empty(), GREEN);
+			PRINT(size(), GREEN);
+		}
+	
+		mapped_type& at(const key_type& key)
 		{ 
-			node_type*	temp = _tree.search(key);
+			iterator	temp = _tree.find_equal(key);
 
 			if (!temp)
 				throw std::out_of_range("ft::map::out_of_range");
-			return (temp->value().second);
+			return (temp->second);
 		};
-		const T& at(const Key& key) const
+	
+		const mapped_type& at(const key_type& key) const
 		{ 
-			const node_type*	temp = _tree.search(key);
+			const_iterator	temp = _tree.find_equal(key);
 
-			if (!temp)
+			if (temp.getConstPtr())
 				throw std::out_of_range("ft::map::out_of_range");
 			return (temp->value().second);
 		};
+	
+		mapped_type&			operator[](const key_type pos)
+		{
+			try
+			{
+				return (at(pos));
+			}
+			catch(const std::out_of_range& e)
+			{
+				return(_tree.insert(ft::make_pair(pos, mapped_type())).first->second);
+			}
+			return (at(pos));
+		}
+		const mapped_type&		operator[](const key_type pos) const
+		{ 
+			try
+			{
+				return (at(pos));
+			}
+			catch(const std::out_of_range& e)
+			{
+				return(_tree.insert(ft::make_pair(pos, mapped_type())).first->value().second);
+			}
+			return (at(pos));
+		}
+
+		insert_return_type	insert (const value_type& value)
+		{
+			return _tree.insert(value);
+		}
+
+		size_type			size() { return _tree.size(); }
+
+		size_type			max_size() { return std::numeric_limits<difference_type>::max(); }
+
+		bool				empty() { return size() == 0; }
+
+		void				clear() { return _tree.clear(); }
+
+		void				erase(iterator pos) { return _tree.erase(pos); }
 
 	private:
 		Allocator			_alloc;

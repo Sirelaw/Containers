@@ -4,6 +4,24 @@
 
 namespace ft
 {
+	template< class T >
+	struct equal
+	{
+		bool operator()(  T lhs_first, T lhs_second, T rhs_first, T rhs_second )
+		{
+			return ((lhs_first == rhs_first) && (lhs_second == rhs_second));
+		}
+	};
+
+	template< class T >
+	struct lexicographical_compare
+	{
+		bool operator()( T lhs_first, T lhs_second, T rhs_first, T rhs_second )
+		{
+			return ((lhs_first < rhs_first) || (!(rhs_first < lhs_first) && (lhs_second < rhs_second)));
+		}
+	};
+
 	template <class Arg1, class Arg2, class Result>
 	struct binary_function
 	{
@@ -51,6 +69,9 @@ namespace ft
 		~reverse_iterator() {}
 
 		iterator_type				base() const { return _current; }
+
+		operator					pointer() const { return (base()); }
+
 		reverse_iterator&			operator=(const reverse_iterator& other) { _current = other.base(); return *this; }
 		reference					operator*() const { iterator_type tmp = _current; return *(--tmp); }
 		pointer						operator->() const { return (&(operator*()));}
@@ -66,6 +87,11 @@ namespace ft
 
 		bool						operator==(const reverse_iterator& other) const { return _current == other.base(); } 
 		bool						operator!=(const reverse_iterator& other) const { return _current != other.base(); } 
+		bool						operator<(const reverse_iterator& other)const{ return other.base() < _current; }
+		bool						operator<=(const reverse_iterator& other)const{ return !(other < *this); }
+		bool						operator>=(const reverse_iterator& other)const{ return !(*this < other); }
+		bool						operator>(const reverse_iterator& other)const{ return (other < *this); }
+
 
 	protected:
 		iterator_type	_current;

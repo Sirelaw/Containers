@@ -1,94 +1,55 @@
 #include "Vector.hpp"
+#include "Stack.hpp"
 #include <vector>
+#include <stack>
+#include <map>
+#include <iostream>
+#include <algorithm>
+#include "verbose.hpp"
+#include "Node.hpp"
+#include "BSTree.hpp"
+#include "RBTree.hpp"
+#include "Pair.hpp"
+#include "Map.hpp"
 
-int main()
+#include <string>
+#include <string_view>
+ 
+void	check()
 {
-    ft::vector<int> ft_first;
-    ft::vector<int> ft_first2;
-    std::vector<int> std_first;
-    std::vector<int> std_first2;
-    ft_first.push_back(1);
-    ft_first.push_back(2);
-    ft_first.push_back(3);
-    ft_first.push_back(4);
-    std_first.push_back(1);
-    std_first.push_back(2);
-    std_first.push_back(3);
-    std_first.push_back(4);
+	system("leaks containers");
+}
 
-    ft::vector<int>::reverse_iterator rit = ft_first.rbegin();
-    ft::vector<int>::reverse_iterator rit2 = ft_first2.rbegin();
-    std::vector<int>::reverse_iterator rits = std_first.rbegin();
-    std::vector<int>::reverse_iterator rits2 = std_first2.rbegin();
-    if(!(((rit == rit2) == (rits == rits2)) && ((rit != rit2) == (rits != rits2)) && ((rit <= rit2) == (rits <= rits2)) &&  ((rit < rit2) == (rits < rits2)) && ((rit >= rit2) == (rits >= rits2)) && ((rit > rit2) == (rits > rits2))))
-    {
-        std::cout << "std " << (rits > rits2) << " (>) ft " << (rit > rit2) << std::endl;
-        std::cout << "std " << (rits < rits2) << " (<) ft "  << (rit < rit2) << std::endl;
-        std::cout << "std " << (rits >= rits2) << " (>=) ft " << (rit >= rit2) << std::endl;
-        std::cout << "std " << (rits <= rits2) << " (<=) ft " << (rit <= rit2) << std::endl;
-        std::cout << "std " << (rits != rits2) << " (!=) ft " << (rit != rit2) << std::endl;
-        std::cout << "std " << (rits == rits2) << " (==) ft " << (rit == rit2) << std::endl;
-        std::cout << "Reverse iterator is inaccurate\n" << std::endl;
-    }
-    ft_first2.push_back(2);
-    std_first2.push_back(2);
-    if(!(((rit == rit2) == (rits == rits2)) && ((rit != rit2) == (rits != rits2)) && ((rit <= rit2) == (rits <= rits2)) && ((rit < rit2) == (rits < rits2)) && ((rit >= rit2) == (rits >= rits2)) && ((rit > rit2) == (rits > rits2))))
-    {
-        std::cout << "std " << (rits > rits2) << " (>) ft " << (rit > rit2) << std::endl;
-        std::cout << "std " << (rits < rits2) << " (<) ft "  << (rit < rit2) << std::endl;
-        std::cout << "std " << (rits >= rits2) << " (>=) ft " << (rit >= rit2) << std::endl;
-        std::cout << "std " << (rits <= rits2) << " (<=) ft " << (rit <= rit2) << std::endl;
-        std::cout << "std " << (rits != rits2) << " (!=) ft " << (rit != rit2) << std::endl;
-        std::cout << "std " << (rits == rits2) << " (==) ft " << (rit == rit2) << std::endl;
-        std::cout << "Reverse iterator is inaccurate after push_back\n" << std::endl;
-    }
-    ft::vector<int> ft_second;
-    ft::vector<int> ft_second2;
-    ft_second.push_back(1);
-    ft_second2.push_back(1);
-    std::vector<int> std_second;
-    std::vector<int> std_second2;
-    std_second.push_back(1);
-    std_second2.push_back(1);
+int	main()
+{
+	std::map<int, std::string>	std_map;
+	ft::map<int, std::string>	my_map;
 
+	my_map.insert(ft::make_pair(1, "1: In my map"));
+	my_map.insert(ft::make_pair(2, "2: In my map"));
+	my_map.insert(ft::make_pair(3, "3: In my map"));
+	my_map.insert(ft::make_pair(4, "4: In my map"));
+	my_map.insert(ft::make_pair(5, "5: In my map"));
+	my_map.insert(ft::make_pair(6, "6: In my map"));
+	std_map.insert(std::make_pair(1, "In std map"));
 
+	PRINT(my_map.at(1), RED);
+	PRINT(my_map.at(6), RED);
+	PRINT(my_map[6], RED);
+	PRINT(my_map[30], RED);
+	PRINT(my_map[350], RED);
+	my_map.erase(my_map.begin() + 2);
 
-
-	for(ft::vector<int>::iterator iter = ft_first.begin(); iter < ft_first.end(); ++iter )
+	for(ft::map<int, std::string>::iterator iter = my_map.begin(); iter != my_map.end(); ++iter)
 	{
-		std::cout << "ft:\t" << *iter << std::endl;
+		std::cout << "key: " << iter->first << "\tvalue: " << (&iter)->second << std::endl;
+		
+	}
+	for(std::map<int, std::string>::iterator iter = std_map.begin(); iter != std_map.end(); ++iter)
+	{
+		std::cout << "key: " << iter->first << "\tvalue: " << iter->second << std::endl;
 	}
 
-	for(std::vector<int>::iterator iter = std_first.begin(); iter < std_first.end(); ++iter )
-	{
-		std::cout << "std:\t" << *iter << std::endl;
-	}
-
-    ft::vector<int>::iterator it = ft_second.begin();
-    ft::vector<int>::iterator it2 = ft_second2.begin();
-    std::vector<int>::iterator its = std_second.begin();
-    std::vector<int>::iterator its2 = std_second2.begin();
-    if(!(((it == it2) == (its == its2)) && ((it != it2) == (its != its2)) && ((it <= it2) == (its <= its2)) && ((it < it2) == (its < its2)) && ((it >= it2) == (its >= its2)) && ((it > it2) == (its > its2))))
-    {
-        std::cout << "std " << (its > its2) << " (>) ft " << (it > it2) << std::endl;
-        std::cout << "std " << (its < its2) << " (<) ft "  << (it < it2) << std::endl;
-        std::cout << "std " << (its >= its2) << " (>=) ft " << (it >= it2) << std::endl;
-        std::cout << "std " << (its <= its2) << " (<=) ft " << (it <= it2) << std::endl;
-        std::cout << "std " << (its != its2) << " (!=) ft " << (it != it2) << std::endl;
-        std::cout << "std " << (its == its2) << " (==) ft " << (it == it2) << std::endl;
-        std::cout << "Iterator is inaccurate\n" << std::endl;
-    }
-    ft_second2.push_back(2);
-    std_second2.push_back(2);
-    if(!(((it == it2) == (its == its2)) && ((it != it2) == (its != its2)) && ((it <= it2) == (its <= its2)) && ((it < it2) == (its < its2)) && ((it >= it2) == (its >= its2)) && ((it > it2) == (its > its2))))
-    {
-        std::cout << "std " << (its > its2) << " (>)  ft " << (it > it2) << std::endl;
-        std::cout << "std " << (its < its2) << " (<) ft "  << (it < it2) << std::endl;
-        std::cout << "std " << (its >= its2) << " (>=) ft " << (it >= it2) << std::endl;
-        std::cout << "std " << (its <= its2) << " (<=) ft " << (it <= it2) << std::endl;
-        std::cout << "std " << (its != its2) << " (!=) ft " << (it != it2) << std::endl;
-        std::cout << "std " << (its == its2) << " (==) ft " << (it == it2) << std::endl;
-        std::cout << "Iterator is inaccurate after push_back\n" << std::endl;
-    }
-    return (42);
+	my_map.testpoint();
+	PRINT(std_map[1], RED);
 }

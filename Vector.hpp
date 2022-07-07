@@ -19,45 +19,44 @@ namespace ft
 	{
 	public:
 		//------------------ Typedefs------------------------------------------//
-		typedef	T									value_type;
-		typedef	Allocator							allocator_type;
-		typedef	std::size_t							size_type;
-		typedef	std::ptrdiff_t						difference_type;
-		typedef	value_type&							reference;
-		typedef	const value_type& 					const_reference;
-		typedef	typename Allocator::pointer			pointer;
-		typedef	typename Allocator::const_pointer	const_pointer;
-		typedef	vecIterator<T>						iterator;
-		typedef	vecIterator<const T>				const_iterator;
-		typedef	vecReverseIterator<T>				reverse_iterator;
-		typedef	vecReverseIterator<const T>			const_reverse_iterator;
+		typedef	T										value_type;
+		typedef	Allocator								allocator_type;
+		typedef	std::size_t								size_type;
+		typedef	std::ptrdiff_t							difference_type;
+		typedef	value_type&								reference;
+		typedef	const value_type& 						const_reference;
+		typedef	typename Allocator::pointer				pointer;
+		typedef	typename Allocator::const_pointer		const_pointer;
+		typedef	vecIterator<T>							iterator;
+		typedef	vecIterator<const T>					const_iterator;
+		typedef ft::reverse_iterator<iterator>			reverse_iterator;
+		typedef ft::reverse_iterator<const_iterator>	const_reverse_iterator;
 
 		//------------------ Iterator Member Functions ------------------------//
 	public:
-		iterator								begin(){ return iterator(&_vec[0]); }
-		iterator								end(){ return iterator(&_vec[_size]); }
-		const_iterator							cbegin() const { return const_iterator(&_vec[0]); }
-		const_iterator							cend() const { return const_iterator(&_vec[_size]); }
-		reverse_iterator						rbegin(){ return reverse_iterator(&_vec[_size - 1]); }
-		reverse_iterator						rend(){ return reverse_iterator(&_vec[-1]); }
-		const_reverse_iterator					crbegin() const { return const_reverse_iterator(&_vec[_size - 1]); }
-		const_reverse_iterator					crend() const { return const_reverse_iterator(&_vec[-1]); }
+		iterator								begin(){ return iterator(_vec); }
+		iterator								end(){ return iterator(_vec + _size); }
+		const_iterator							cbegin() const { return const_iterator(_vec); }
+		const_iterator							cend() const { return const_iterator(_vec + _size); }
+		reverse_iterator						rbegin(){ return reverse_iterator(end()); }
+		reverse_iterator						rend(){ return reverse_iterator(begin()); }
+		const_reverse_iterator					crbegin() const { return const_reverse_iterator(cend()); }
+		const_reverse_iterator					crend() const { return const_reverse_iterator(cbegin()); }
 
 		//----------------------- Member Functions ----------------------------//
 	public:
-		vector() : _capacity(0), _size(0) {
-			_vec = _alloc.allocate(capacity());
-		}
+		vector() : _capacity(0), _size(0), _vec(nullptr) { }
 
-		explicit vector( const Allocator& alloc ) : _capacity(0), _size(0) {
+		explicit vector( const Allocator& alloc ) : _capacity(0), _size(0), _vec(nullptr) 
+		{
 			_alloc = alloc;
-			_vec = _alloc.allocate(capacity());
 		}
 
 		explicit vector ( size_type count, const T& value = T(), const Allocator& alloc = Allocator()) 
-			: _capacity(count), _size(count) {
+			: _capacity(count), _size(count), _vec(nullptr) {
 			_alloc = alloc;
-			_vec = _alloc.allocate(capacity());
+			if (_capacity)
+				_vec = _alloc.allocate(capacity());
 			for (iterator iter = begin(); iter < end(); iter++)
 				_alloc.construct(iter, T(value));
 		}
@@ -65,19 +64,23 @@ namespace ft
 		template <class InputIt>
 		vector( InputIt first, InputIt last, const Allocator& alloc = Allocator(),
 				typename ft::enable_if<!ft::is_integral<InputIt>::value>::type* = nullptr)
-			: _capacity(0), _size(0){
+			: _capacity(0), _size(0), _vec(nullptr) 
+		{
 			_alloc = alloc;
-			_vec = _alloc.allocate(0);
 			assign(first, last);
 		}
 
-		vector(const vector& to_copy) : _capacity(0), _size(0) {
-			_vec = _alloc.allocate(capacity());
+		vector(const vector& to_copy) : _capacity(0), _size(0), _vec(nullptr) 
+		{
 			*this = to_copy;
 		}
 
-		~vector() {
-			_alloc.deallocate(_vec, capacity());
+		~vector() 
+		{
+			clear();
+			if (_vec)
+				_alloc.deallocate(_vec, capacity());
+			_vec = nullptr;
 		}
 
 		vector& 								operator=(const vector& other){
@@ -86,7 +89,8 @@ namespace ft
 				iterator	temp;
 
 				this->clear();
-				_alloc.deallocate(_vec, capacity());
+				if (_vec)
+					_alloc.deallocate(_vec, capacity());
 				_size = other.size();
 				_capacity = other.capacity();
 				_alloc = Allocator(other.get_allocator());
@@ -105,7 +109,8 @@ namespace ft
 			this->clear();
 			_size = count;
 			if (count > capacity()){
-				_alloc.deallocate(_vec, capacity());
+				if (_vec)
+					_alloc.deallocate(_vec, capacity());
 				_vec = _alloc.allocate(count);
 				_capacity = count;
 			}
@@ -122,7 +127,8 @@ namespace ft
 			this->clear();
 			_size = count;
 			if (count > capacity()){
-				_alloc.deallocate(_vec, capacity());
+				if (_vec)
+					_alloc.deallocate(_vec, capacity());
 				_vec = _alloc.allocate(count);
 				_capacity = count;
 			}
@@ -151,7 +157,8 @@ namespace ft
 		bool									empty() const { return size() == 0; }
 		size_type								max_size() const { return std::min<size_type>(_alloc.max_size(), 
 																			std::numeric_limits<difference_type>::max());}
-		void									clear(){
+		void									clear()
+		{
 			for (iterator iter = begin(); iter != end(); ++iter)
 				_alloc.destroy(iter);
 			_size = 0;
@@ -279,6 +286,7 @@ namespace ft
 		size_type		_size;
 		T*				_vec;
 		Allocator		_alloc;
+
 	};
 
 	template< class T, class Alloc >
