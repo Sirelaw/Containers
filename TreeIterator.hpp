@@ -30,7 +30,7 @@ namespace ft
 		treeIterator(pointer ptr = nullptr) : _ptr(ptr)				{ }
 		treeIterator(const treeIterator& other) : _ptr(other.getPtr())	{ }
 		~treeIterator(){}
-
+protected:
 		pointer	next_node(pointer ptr)
 		{
 			if (!ptr->parent())
@@ -58,7 +58,7 @@ namespace ft
 				return ptr;
 			return ptr->parent();
 		}
-
+public:
 		treeIterator&							operator=(const treeIterator& other) { _ptr = other.getPtr(); return *this; }
 
 		operator								pointer() const { return (_ptr); }
@@ -100,7 +100,7 @@ namespace ft
 		}
 
 		pointer										operator*(){ return this->_ptr; }
-		const pointer								operator*() const { return this->_ptr->value(); }
+		const_pointer								operator*() const { return this->_ptr; }
 		value_type*										operator->() const { return &(this->_ptr->value()); }
 		value_type*										operator&() const { return &(this->_ptr->value()); }
 
@@ -118,6 +118,7 @@ namespace ft
 	public:
 		typedef T														value_type;
 		typedef Node<T>													node_type;
+		typedef treeIterator<T>											treeIterator;
 		typedef const node_type*										const_pointer;
 		typedef	const_pointer											pointer;
 		typedef	const node_type& 										const_reference;
@@ -130,7 +131,8 @@ namespace ft
 
 	public:
 		const_treeIterator(const pointer ptr = nullptr)	: _ptr(ptr)		{ }
-		const_treeIterator(const const_treeIterator& other) : _ptr(other.getPtr())	{ } /////////
+		const_treeIterator(const const_treeIterator& other) : _ptr(other.getPtr())	{ }
+		const_treeIterator(const treeIterator& other) : _ptr(other.getConstPtr()) { }
 		~const_treeIterator(){}
 	protected:
 		const pointer	next_node(pointer ptr)
@@ -160,17 +162,17 @@ namespace ft
 				return ptr;
 			return ptr->parent();
 		}
+public:
+		const_treeIterator&								operator=(const const_treeIterator& other) { _ptr = other.getPtr(); return *this; } /////////
 
-		const_treeIterator&						operator=(const const_treeIterator& other) { _ptr = other.getPtr(); return *this; } /////////
-	
-		operator								pointer() const { return (_ptr); }
+		operator										pointer() const { return (_ptr); }
 
-		bool									operator==(const Node<T>& rawIterator)const{return (_ptr == rawIterator.getConstPtr()); }
-		bool									operator!=(const Node<T>& rawIterator)const{return (_ptr != rawIterator.getConstPtr()); }
-		// bool									operator<(const Node<T>& rawIterator)const{return (_ptr->value() < rawIterator.getConstPtr()->value()); }
-		// bool									operator<=(const Node<T>& rawIterator)const{return (_ptr->value() <= rawIterator.getConstPtr()->value()); }
-		// bool									operator>(const Node<T>& rawIterator)const{return (_ptr->value() > rawIterator.getConstPtr()->value()); }
-		// bool									operator>=(const Node<T>& rawIterator)const{return (_ptr->value() >= rawIterator.getConstPtr()->value()); }
+		bool											operator==(const Node<T>& rawIterator)const{return (_ptr == rawIterator.getConstPtr()); }
+		bool											operator!=(const Node<T>& rawIterator)const{return (_ptr != rawIterator.getConstPtr()); }
+		// bool											operator<(const Node<T>& rawIterator)const{return (_ptr->value() < rawIterator.getConstPtr()->value()); }
+		// bool											operator<=(const Node<T>& rawIterator)const{return (_ptr->value() <= rawIterator.getConstPtr()->value()); }
+		// bool											operator>(const Node<T>& rawIterator)const{return (_ptr->value() > rawIterator.getConstPtr()->value()); }
+		// bool											operator>=(const Node<T>& rawIterator)const{return (_ptr->value() >= rawIterator.getConstPtr()->value()); }
 
 		const_treeIterator<T>&							operator+=(const difference_type& movement) {
 			difference_type temp = movement;
@@ -191,7 +193,7 @@ namespace ft
 		const_treeIterator<T>							operator+(const difference_type& movement) const { const_treeIterator<T> temp(*this); temp += movement; return (temp); }
 		const_treeIterator<T>							operator-(const difference_type& movement) const { const_treeIterator<T> temp(*this); temp -= movement; return (temp); }
 
-		difference_type							operator-(const const_treeIterator<T>& rawIterator) const {
+		difference_type									operator-(const const_treeIterator<T>& rawIterator) const {
 			difference_type		temp = 0;
 			const_treeIterator<T>		temp_iter(*this);
 			while (temp_iter.getConstPtr() != rawIterator.getConstPtr()){
@@ -201,10 +203,10 @@ namespace ft
 			return (temp);
 		}
 
-		const pointer								operator*() const { return _ptr; }
-		const value_type*									operator->() const { return &(this->_ptr->value()); }
-		const pointer										getPtr() const { return _ptr; }
-		const pointer								getConstPtr() const { return _ptr; }
+		const_pointer									operator*() const { return _ptr; }
+		const value_type*								operator->() const { return &(this->_ptr->value()); }
+		const pointer									getPtr() const { return _ptr; }
+		const pointer									getConstPtr() const { return _ptr; }
 
 	protected:
 		pointer	_ptr;

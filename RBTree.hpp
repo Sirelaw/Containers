@@ -55,14 +55,14 @@ namespace ft
 		typedef	bidirectional_iterator_tag								iterator_category;
 
 public:
-	iterator								begin(){ return iterator(_begin_ptr); }
-	iterator								end(){ return iterator(&_root_parent); }
-	const_iterator							cbegin() const { return const_iterator(_begin_ptr); }
-	const_iterator							cend() const { return const_iterator(&_root_parent); }
-	reverse_iterator						rbegin(){ return reverse_iterator(&_root_parent); }
-	reverse_iterator						rend(){ return reverse_iterator(_begin_ptr); }
-	const_reverse_iterator					crbegin() const { return const_iterator(&_root_parent); }
-	const_reverse_iterator					crend() const { return const_iterator(_begin_ptr); }
+	iterator								begin(){ return _begin_ptr; }
+	iterator								end(){ return &_root_parent; }
+	const_iterator							cbegin() const { return _begin_ptr; }
+	const_iterator							cend() const { return &_root_parent; }
+	reverse_iterator						rbegin(){ return &_root_parent; }
+	reverse_iterator						rend(){ return _begin_ptr; }
+	const_reverse_iterator					crbegin() const { return &_root_parent; }
+	const_reverse_iterator					crend() const { return _begin_ptr; }
 
 //////////------------------ CONSTRUCTION & ASSIGNMENT ---------------////////////////////
 
@@ -200,10 +200,12 @@ public:
 			{
 				temp = iter + 1;
 				_node_alloc.destroy(iter);
+				this->_value_alloc.destroy(&((*iter)->value()));
 				_node_alloc.deallocate(iter, 1);
 				iter = temp;
 			}
 			_size = 0;
+			_begin_ptr = &_root_parent;
 			set_root(nullptr);
 		}
 		void		erase(iterator pos)
@@ -211,9 +213,23 @@ public:
 			if (pos)
 			{
 				if (pos == iterator(_begin_ptr))
-					_begin_ptr = _begin_ptr->parent();
+					_begin_ptr = *(++(iterator(_begin_ptr)));
 				delete_single_node(**pos);
 				this->_size--;
+			}
+		}
+		void		erase(iterator first, iterator last)
+		{
+			iterator	temp(first);
+		
+			++temp;
+			for(iterator iter = first; iter != last;)
+			{
+				if (iter == iterator(_begin_ptr))
+					_begin_ptr = *(++(iterator(_begin_ptr)));
+				delete_single_node(**iter);
+				--_size;
+				iter = temp++;
 			}
 		}
 public:
@@ -222,7 +238,7 @@ public:
 		void	remove(node_type& node)
 		{
 			if (&node == _begin_ptr)
-				_begin_ptr = _begin_ptr->parent();
+				_begin_ptr = *(++(iterator(_begin_ptr)));
 			delete_single_node(node);
 			this->_size--;
 		}
@@ -233,7 +249,7 @@ public:
 
 			if (temp){
 				if (temp == _begin_ptr)
-					_begin_ptr = _begin_ptr->parent();
+					_begin_ptr = *(++(iterator(_begin_ptr)));
 				delete_single_node(*temp);
 				this->_size--;
 			}
@@ -338,7 +354,8 @@ public:
 			ptr_vec.push_back(root());
 			while (ptr_vec.size() > i)
 			{
-				std::cout << " ->" << ptr_vec[i]->value() << "\t(" << ptr_vec[i]->color() << ", " << ptr_vec[i]->balance_factor() << ", " 
+				std::cout << " ->" << ptr_vec[i]->value() << "\t(" << ptr_vec[i]->color() << ", " 
+								<< ptr_vec[i]->balance_factor() << ", " 
 							<< ptr_vec[i]->parent()->value() << ")" << std::endl;
 				if (ptr_vec[i]->left_child())
 					ptr_vec.push_back(ptr_vec[i]->left_child());
@@ -361,7 +378,8 @@ public:
 			while (ptr_vec.size() > i)
 			{
 				std::cout << " ->" << ptr_vec[i]->value().first
-							<< " : " << ptr_vec[i]->value().second << "\t(" << ptr_vec[i]->color() << ", " << ptr_vec[i]->balance_factor() << ", " 
+							<< " : " << ptr_vec[i]->value().second << "\t(" << ptr_vec[i]->color() << ", " 
+							<< ptr_vec[i]->balance_factor() << ", " 
 							<< ptr_vec[i]->parent()->value().first << ")" << std::endl;
 				if (ptr_vec[i]->left_child())
 					ptr_vec.push_back(ptr_vec[i]->left_child());
@@ -378,11 +396,11 @@ public:
 		template<class U>
 		struct	key_equals : binary_function<value_type, U, bool>
 		{
-			bool	operator()(value_type lhs, U rhs) { return lhs.first == rhs; }
+			bool	operator()(const value_type& lhs, const U& rhs) { return lhs.first == rhs; }
 		};
 
 		template <class U>
-		iterator	find_equal(U key)
+		iterator	find_equal(const U& key) const
 		{
 			node_type*	node = root();
 
@@ -394,6 +412,14 @@ public:
 					node = node->right_child();
 			}
 			return iterator(node);
+		}
+
+		template <class U>
+		size_type	count(const U& key) const
+		{
+			iterator	elem = find_equal(key);
+			if (elem) { return 1; }
+			return 0;
 		}
 
 		node_type*	search(const T& value)
@@ -560,6 +586,32 @@ public :
 			PRINT("<<<<<--------->>>>>>", GREEN);
 			print_tree_map_by_level();
 			print_map_tree_in_order();
+		}
+
+		void	swap(RBTree& other)
+		{
+			node_type*			this_root = this->root();
+			node_type*			this_begin_ptr = this->_begin_ptr;
+			size_t				this_size = this->_size;
+			value_allocator		this_value_alloc = this->_value_alloc;
+			node_allocator		this_node_alloc = this->_node_alloc;
+
+			this->_root_parent.link_left_child(other.root());
+			if (other.size())
+				this->_begin_ptr = other._begin_ptr;
+			else
+				this->_begin_ptr = this->end();
+			this->_size = other._size;
+			this->_value_alloc = other._value_alloc;
+			this->_node_alloc = other._node_alloc;
+			other._root_parent.link_left_child(this_root);
+			if (this_size)
+				other._begin_ptr = this_begin_ptr;
+			else
+				other._begin_ptr = other.end();
+			other._size = this_size;
+			other._value_alloc = this_value_alloc;
+			other._node_alloc = this_node_alloc;
 		}
 
 	protected:

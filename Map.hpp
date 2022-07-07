@@ -5,7 +5,6 @@
 #include <string>
 #include "Pair.hpp"
 #include "RBTree.hpp"
-// #include "MapIterator.hpp"
 #include "IteratorTraits.hpp"
 
 namespace ft
@@ -25,8 +24,15 @@ namespace ft
 				return (Compare()(lhs.first, rhs.first));
 			}
 		};
+		struct	key_compare : binary_function<key_type, key_type, bool>
+		{
+			bool	operator()( const key_type& lhs, const key_type& rhs ) const
+			{
+				return (Compare()(lhs, rhs));
+			}
+		};
 
-		typedef Compare														key_compare;
+		// typedef Compare														key_compare;
 		typedef Allocator													allocator_type;
 		typedef RBTree<value_type, value_compare, Allocator>				tree_type;
 		typedef typename tree_type::node_type								node_type;
@@ -66,7 +72,7 @@ namespace ft
 			for (iterator temp = first; temp != last; ++temp)
 				_tree.insert(*temp);
 		}
-		~map() {};
+		~map() { };
 		map& operator=(const map& other)
 		{
 			_tree = other._tree;
@@ -78,7 +84,6 @@ namespace ft
 		void	testpoint()
 		{
 			_tree.test_map();
-			clear();
 			PRINT(empty(), GREEN);
 			PRINT(size(), GREEN);
 		}
@@ -96,9 +101,9 @@ namespace ft
 		{ 
 			const_iterator	temp = _tree.find_equal(key);
 
-			if (temp.getConstPtr())
+			if (!temp)
 				throw std::out_of_range("ft::map::out_of_range");
-			return (temp->value().second);
+			return (temp->second);
 		};
 	
 		mapped_type&			operator[](const key_type pos)
@@ -111,7 +116,6 @@ namespace ft
 			{
 				return(_tree.insert(ft::make_pair(pos, mapped_type())).first->second);
 			}
-			return (at(pos));
 		}
 		const mapped_type&		operator[](const key_type pos) const
 		{ 
@@ -123,7 +127,6 @@ namespace ft
 			{
 				return(_tree.insert(ft::make_pair(pos, mapped_type())).first->value().second);
 			}
-			return (at(pos));
 		}
 
 		insert_return_type	insert (const value_type& value)
@@ -140,11 +143,34 @@ namespace ft
 		void				clear() { return _tree.clear(); }
 
 		void				erase(iterator pos) { return _tree.erase(pos); }
+		void				erase(iterator first, iterator last) { return _tree.erase(first, last); }
+
+		void				swap(map& other)
+		{
+			Allocator		this_alloc = this->_alloc;
+			Compare			this_value_compare = this->_value_compare;
+			
+			_tree.swap(other._tree);
+			_alloc = other.get_allocator();
+			_value_compare = other._value_compare;
+			other._alloc = this_alloc;
+			other._value_compare = this_value_compare;
+		}
+
+		size_type			count(const key_type& key) const { return _tree.count(key); }
+
+		iterator			find(const Key& key)
+		{
+			iterator	temp = _tree.find_equal(key);
+
+			if (temp) return temp;
+			return end();
+		}
 
 	private:
-		Allocator			_alloc;
-		value_compare		_value_compare;
-		tree_type			_tree;
+		Allocator		_alloc;
+		Compare			_value_compare;
+		tree_type		_tree;
 
 	};
 }
