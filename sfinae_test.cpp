@@ -41,4 +41,7 @@ int main()
 	C<B>	c;
 	
 	return 0;
+
 }
+
+

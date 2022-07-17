@@ -35,7 +35,7 @@ namespace ft
 
 	public:	
 		typedef typename Allocator::template rebind< node_type >::other		node_allocator;
-		typedef typename Allocator::template rebind< value_type >::other	value_allocator;
+		// typedef typename Allocator::template rebind< value_type >::other	value_allocator;
 		typedef node_type*													node_pointer;
 		typedef typename Allocator::pointer         						pointer;
     	typedef typename Allocator::const_pointer  							const_pointer;
@@ -54,40 +54,54 @@ namespace ft
 		typedef pair<iterator, bool>									insert_return_type;
 		typedef	bidirectional_iterator_tag								iterator_category;
 
-public:
-	iterator								begin(){ return _begin_ptr; }
-	iterator								end(){ return &_root_parent; }
-	const_iterator							cbegin() const { return _begin_ptr; }
-	const_iterator							cend() const { return &_root_parent; }
-	reverse_iterator						rbegin(){ return &_root_parent; }
-	reverse_iterator						rend(){ return _begin_ptr; }
-	const_reverse_iterator					crbegin() const { return &_root_parent; }
-	const_reverse_iterator					crend() const { return _begin_ptr; }
+	public:
+		iterator														begin(){ return _begin_ptr; }
+		iterator														end(){ return &_root_parent; }
+		const_iterator													begin() const { return _begin_ptr; }
+		const_iterator													end() const { return &_root_parent; }
+		const_iterator													cbegin() const { return _begin_ptr; }
+		const_iterator													cend() const { return &_root_parent; }
+		reverse_iterator												rbegin(){ return &_root_parent; }
+		reverse_iterator												rend(){ return _begin_ptr; }
+		const_reverse_iterator											rbegin() const { return &_root_parent; }
+		const_reverse_iterator											rend() const { return _begin_ptr; }
+		const_reverse_iterator											crbegin() const { return &_root_parent; }
+		const_reverse_iterator											crend() const { return _begin_ptr; }
 
 //////////------------------ CONSTRUCTION & ASSIGNMENT ---------------////////////////////
 
-		RBTree() : _size(0) { _begin_ptr = &_root_parent; }
-		RBTree(const RBTree& to_copy) : _size(0) { _begin_ptr = &_root_parent; *this = to_copy; }
-
-		RBTree& operator=(const RBTree& tree)
+		RBTree(const Compare& comp = Compare(), const Allocator& alloc = Allocator())
+			: _begin_ptr (&_root_parent), _size(0), _compare(comp), _alloc(alloc)
 		{
-			if ((this != &tree) && tree.root())
+
+		} 
+		RBTree(const value_type* first, const value_type* last, const Compare& comp = Compare())
+			: _begin_ptr (&_root_parent), _size(0), _compare(comp)
+		{
+			while (first != last) insert(*(first++));
+		}
+		RBTree(const RBTree<value_type, Compare, Allocator>& other)
+			: _begin_ptr(&_root_parent), _size(0), _compare(other._compare), _alloc(other._alloc),
+				_node_alloc(other._node_alloc)
+		{
+			*this = other;
+		}
+
+		RBTree& operator=(const RBTree& other)
+		{
+			if ((this != &other) && other.root())
 			{
-				if (root()){
-					destroy_children(*(root()));
-					delete_single_node(*(root()));
-				}
-				for (const_iterator iter = tree.cbegin(); iter != tree.cend(); iter++)
+				this->clear();
+				_node_alloc = other._node_alloc;
+				for (const_iterator iter = other.cbegin(); iter != other.cend(); iter++)
 				{
-					this->insert(iter->value());
+					this->insert(*iter);
 				}
 			}
 			return *this;
 		}
 
-		~RBTree(){
-			this->clear();
-		}
+		~RBTree() { this->clear(); }
 
 //////////--------------------- GETTERS & SETTERS--------------------////////////////////
 private:
@@ -105,7 +119,7 @@ private:
 			if (_size == 1)
 			{
 				set_root(_node_alloc.allocate(1));
-				_node_alloc.construct(root(), node_type(val));
+				_node_alloc.construct(root(), val);
 				root()->set_parent(&_root_parent);
 				root()->set_color(false);
 				_root_parent.set_color(false);
@@ -122,27 +136,27 @@ private:
 			temp = &node;
 			while (temp)
 			{
-				if (Compare()(temp->value(), val)){
-					if (Compare()(val, temp->value()))
+				if (_compare(temp->value(), val)){
+					if (_compare(val, temp->value()))
 						return ft::make_pair(iterator(temp), false);
 					else if (temp->right_child())
 						temp = temp->right_child();
 					else{
 						temp->link_right_child(_node_alloc.allocate(1));
-						_node_alloc.construct(temp->right_child(), node_type(val));
+						_node_alloc.construct(temp->right_child(), val);
 						temp->right_child()->set_parent(temp);
 						temp = temp->right_child();
 						break;
 					}
 				}
 				else{
-					if (!Compare()(val, temp->value()))
+					if (!_compare(val, temp->value()))
 						return ft::make_pair(iterator(temp), false);
 					else if (temp->left_child())
 						temp = temp->left_child();
 					else{
 						temp->link_left_child(_node_alloc.allocate(1));
-						_node_alloc.construct(temp->left_child(), node_type(val));
+						_node_alloc.construct(temp->left_child(), val);
 						temp->left_child()->set_parent(temp);
 						if (temp == _begin_ptr)
 							_begin_ptr = temp->left_child();
@@ -153,11 +167,400 @@ private:
 			}
 			return ft::make_pair(iterator(temp), true);
 		}
+///////////////////////// inserting with hint
+
+// iterator	__insert(node_pointer x, node_pointer y, const value_type& v) {
+//     ++node_count;
+//     node_pointer z = _node_alloc.allocate(1);
+// 	_node_alloc.construct(z, val)
+//     if (y == header || x != NIL || key_compare(KeyOfValue()(v), key(y))) {
+//         left(y) = z;  // also makes leftmost() = z when y == header
+//         if (y == header) {
+//             root() = z;
+//             rightmost() = z;
+//         } else if (y == leftmost())
+//             leftmost() = z;   // maintain leftmost() pointing to minimum node
+//     } else {
+//         right(y) = z;
+//         if (y == rightmost())
+//             rightmost() = z;   // maintain rightmost() pointing to maximum node
+//     }
+//     parent(z) = y;
+//     left(z) = NIL;
+//     right(z) = NIL;
+//     x = z;  // recolor and rebalance the tree
+//     color(x) = red;
+//     while (x != root() && color(parent(x)) == red) 
+//         if (parent(x) == left(parent(parent(x)))) {
+//             y = right(parent(parent(x)));
+//             if (color(y) == red) {
+//                 color(parent(x)) = black;
+//                 color(y) = black;
+//                 color(parent(parent(x))) = red;
+//                 x = parent(parent(x));
+//             } else {
+//                 if (x == right(parent(x))) {
+//                     x = parent(x);
+//                     rotate_left(x);
+//                 }
+//                 color(parent(x)) = black;
+//                 color(parent(parent(x))) = red;
+//                 rotate_right(parent(parent(x)));
+//             }
+//         } else {
+//             y = left(parent(parent(x)));
+//             if (color(y) == red) {
+//                 color(parent(x)) = black;
+//                 color(y) = black;
+//                 color(parent(parent(x))) = red;
+//                 x = parent(parent(x));
+//             } else {
+//                 if (x == left(parent(x))) {
+//                     x = parent(x);
+//                     rotate_right(x);
+//                 }
+//                 color(parent(x)) = black;
+//                 color(parent(parent(x))) = red;
+//                 rotate_left(parent(parent(x)));
+//             }
+//         }
+//     color(root()) = black;
+//     return iterator(z);
+// }
+	
+
+// iterator	insert(iterator position, const Value& v)
+// {
+//     if (position == begin())
+//         if (size() > 0 && _compare(v, *position))
+//             return __insert(position.getPtr(), position.getPtr(), v);
+//             // first argument just needs to be non-NIL 
+//         else
+//             return insert(v).first;
+//     else if (position == iterator(end()))
+//         if (_compare(key(rightmost()), KeyOfValue()(v)))
+//             return __insert(NIL, rightmost(), v);
+//         else
+//             return insert(v).first;
+//     else {
+//         iterator before = --position;
+//         if (_compare(key(before.node), KeyOfValue()(v))
+//             && _compare(KeyOfValue()(v), key(position.node)))
+//             if (right(before.node) == NIL)
+//                 return __insert(NIL, before.node, v); 
+//             else
+//                 return __insert(position.node, position.node, v);
+//                 // first argument just needs to be non-NIL 
+//         else
+//             return insert(v).first;
+//     }
+// }
+
+//////////// end insert with hint
+
 public:
 		insert_return_type	insert(const T& val)
 		{
-			insert_return_type	inserted = new_insert(val);
-			node_type*			temp = inserted.first;
+			return rebalance_after_insert(new_insert(val));
+		}
+
+		// iterator insert( iterator hint, const value_type& value )
+		// {
+		// 	return _tree.insert(hint, value);
+		// }
+
+		// template< class InputIt >
+		// void insert( InputIt first, InputIt last )
+		// {
+		// 	return _tree.insert(first, last);
+		// }
+
+
+//////////-------------------------- DELETE ------------------------////////////////////
+private:
+		void	delete_node(node_type* node)
+		{
+			if (node)
+			{
+				delete_node(node->left_child());
+				delete_node(node->right_child());
+				_node_alloc.destroy(node);
+				_node_alloc.deallocate(node, 1);
+			}
+		}
+public:
+		void		clear()
+		{
+			if (!root())
+				return ;
+			delete_node(root());
+			_size = 0;
+			_begin_ptr = &_root_parent;
+			set_root(nullptr);
+		}
+		void		erase(iterator pos)
+		{
+			if (pos.getPtr())
+			{
+				if (pos == iterator(_begin_ptr))
+					_begin_ptr = (++(iterator(_begin_ptr))).getPtr();
+				delete_single_node(*(pos.getPtr()));
+				this->_size--;
+			}
+		}
+		void		erase(iterator first, iterator last)
+		{
+			iterator	temp(first);
+		
+			++temp;
+			for(iterator iter = first; iter != last;)
+			{
+				if (iter == iterator(_begin_ptr))
+					_begin_ptr = (++(iterator(_begin_ptr))).getPtr();
+				delete_single_node(*(iter.getPtr()));
+				--_size;
+				iter = temp++;
+			}
+		}
+		template <typename Key>
+		size_type erase( const Key& key )
+		{
+			iterator	elem = find_equal(key);
+			if (elem == end())
+				return 0;
+			if (elem == iterator(_begin_ptr))
+				_begin_ptr = (++(iterator(_begin_ptr))).getPtr();
+			delete_single_node(*(elem.getPtr()));
+			--_size;
+			return 1;
+		}
+
+private:
+		void	delete_single_node(node_type& node)
+		{
+			int			offspring	= node.count_children();
+			node_type*	temp = &node;
+
+			if (offspring == 1){
+				delete_single_node(node.swap_node(node.single_child()));}
+			else if (offspring == 2)
+				delete_single_node(node.swap_node(node.in_order_successor()));
+			else{
+				resolve_double_black(node);
+				*(node.parent_branch()) = nullptr;
+				this->_node_alloc.destroy(temp);
+				this->_node_alloc.deallocate(temp, 1);
+			}
+		}
+
+public:
+
+//////////------------------------ HELPERS -----------------------////////////////////
+
+		template <class Key>
+		iterator	find_equal(const Key& key)
+		{
+			node_type*	node = root();
+
+			while (node != nullptr && !equal_to<Key>()(node->value().first, key))
+			{
+				if (key < node->value().first)
+					node = node->left_child();
+				else
+					node = node->right_child();
+			}
+			if (!node)
+				return end();
+			return iterator(node);
+		}
+
+		template <class Key>
+		const_iterator	find_equal(const Key& key) const
+		{
+			node_type*	node = root();
+
+			while (node != nullptr && !equal_to<Key>()(node->value().first, key))
+			{
+				if (key < node->value().first)
+					node = node->left_child();
+				else
+					node = node->right_child();
+			}
+			if (!node)
+				return cend();
+			return const_iterator(node);
+		}
+
+		template<class Key>
+		pair<iterator,iterator> equal_range( const Key& key )
+		{
+			return make_pair(lower_bound(key), upper_bound(key)); 
+		}
+
+		template<class Key>
+		pair<const_iterator,const_iterator> equal_range( const Key& key ) const
+		{
+			return make_pair(lower_bound(key), upper_bound(key)); 
+		}
+
+		template <class Key>
+		iterator	lower_bound(const Key& key)
+		{
+			node_type*	node = root();
+			iterator	result = end();
+
+			while (node != nullptr)
+			{
+				if (!less<Key>()(node->value().first, key))
+				{
+					result = iterator(node);
+					node = (node->left_child());
+				}
+				else
+					node = node->right_child();
+			}
+			return result;
+		}
+
+		template <class Key>
+		const_iterator	lower_bound(const Key& key) const
+		{
+			const node_type*	node = root();
+			const_iterator		result = cend();
+
+			while (node != nullptr)
+			{
+				if (!less<Key>()(node->value().first, key))
+				// if (!_compare(val, temp->value()))
+				{
+					result = const_iterator(node);
+					node = (node->left_child());
+				}
+				else
+					node = node->right_child();
+			}
+			return result;
+		}
+
+		template<class Key>
+		iterator	upper_bound(const Key& key)
+		{
+			node_type*	node = root();
+			node_type*	result = end().getPtr();
+
+			while (node != nullptr)
+			{
+				if (less<Key>()(key, node->value().first))
+				{
+					result = node;
+					node = node->left_child();
+				}
+				else
+					node = node->right_child();
+			}
+			return iterator(result);
+		}
+
+		template <class Key>
+		const_iterator upper_bound(const Key& key) const
+		{
+			const node_type*	node = root(); /* Current node. */
+			const_iterator		result = cend(); /* Last node which is greater than k. */
+
+			while (node != nullptr) 
+			{
+				if (less<Key>()(key, node->value().first))
+				{
+					result = const_iterator(node);
+					node = node->left_child();
+				}	
+				else
+					node = node->right_child();
+			}	
+			return result;
+		}
+
+		template <class U>
+		size_type	count(const U& key) const
+		{
+			const_iterator	elem = find_equal(key);
+			size_type	num;
+
+			if (elem != cend())
+			{
+				num = 1;
+				while (((++elem)->first < key) == (key < (elem)->first))
+					num++;
+				return num; 
+			}
+			return 0;
+		}
+
+		void	swap(RBTree& other)
+		{
+			node_type*			this_root = this->root();
+			node_type*			this_begin_ptr = this->_begin_ptr;
+			size_t				this_size = this->_size;
+			node_allocator		this_node_alloc = this->_node_alloc;
+
+			this->_root_parent.link_left_child(other.root());
+			if (other.size())
+				this->_begin_ptr = other._begin_ptr;
+			else
+				this->_begin_ptr = (this->end()).getPtr();
+			this->_size = other._size;
+			this->_node_alloc = other._node_alloc;
+			other._root_parent.link_left_child(this_root);
+			if (this_size)
+				other._begin_ptr = this_begin_ptr;
+			else
+				other._begin_ptr = (other.end()).getPtr();
+			other._size = this_size;
+			other._node_alloc = this_node_alloc;
+		}
+
+private:
+		int		determine_setup(node_type& node) const
+		{
+			if (node.parent()->is_left() && node.is_left())
+				return LL;
+			else if (node.parent()->is_left() && node.is_right())
+				return LR;
+			else if (node.parent()->is_right() && node.is_left())
+				return RL;
+			return RR;
+		}
+
+		node_type&	predecessor(node_type& node)
+		{
+			node_type*	max;
+
+			max = node->left_child();
+			while (max->right_child())
+				max = max->right_child();
+			return *max;
+		}
+
+		node_type&	successor(node_type& node)
+		{
+			node_type*	min;
+
+			min = node->right_child();
+			while (min->left_child())
+				min = min->left_child();
+			return *min;
+		}
+
+		int	balance_factor(node_type& node) const
+		{
+			return node.balance_factor();
+		}
+
+//////////------------------------ REBALANCE -----------------------////////////////////
+
+		insert_return_type	rebalance_after_insert(insert_return_type inserted)
+		{
+			node_type*			temp = inserted.first.getPtr();
 
 			if (inserted.second == false)
 				_size--;
@@ -189,304 +592,6 @@ public:
 			}
 			return inserted;
 		}
-
-//////////-------------------------- DELETE ------------------------////////////////////
-public:
-		void		clear()
-		{
-			if (!root())
-				return ;
-			for(iterator iter = begin(), temp; iter != end();)
-			{
-				temp = iter + 1;
-				_node_alloc.destroy(iter);
-				this->_value_alloc.destroy(&((*iter)->value()));
-				_node_alloc.deallocate(iter, 1);
-				iter = temp;
-			}
-			_size = 0;
-			_begin_ptr = &_root_parent;
-			set_root(nullptr);
-		}
-		void		erase(iterator pos)
-		{
-			if (pos)
-			{
-				if (pos == iterator(_begin_ptr))
-					_begin_ptr = *(++(iterator(_begin_ptr)));
-				delete_single_node(**pos);
-				this->_size--;
-			}
-		}
-		void		erase(iterator first, iterator last)
-		{
-			iterator	temp(first);
-		
-			++temp;
-			for(iterator iter = first; iter != last;)
-			{
-				if (iter == iterator(_begin_ptr))
-					_begin_ptr = *(++(iterator(_begin_ptr)));
-				delete_single_node(**iter);
-				--_size;
-				iter = temp++;
-			}
-		}
-public:
-
-
-		void	remove(node_type& node)
-		{
-			if (&node == _begin_ptr)
-				_begin_ptr = *(++(iterator(_begin_ptr)));
-			delete_single_node(node);
-			this->_size--;
-		}
-
-		void	remove(T value)
-		{
-			node_type*	temp = this->search(value);
-
-			if (temp){
-				if (temp == _begin_ptr)
-					_begin_ptr = *(++(iterator(_begin_ptr)));
-				delete_single_node(*temp);
-				this->_size--;
-			}
-		}
-private:
-		void	delete_single_node(node_type& node)
-		{
-			int			offspring	= node.count_children();
-			node_type*	temp = &node;
-
-			if (offspring == 1){
-				delete_single_node(node.swap_node(node.single_child()));}
-			else if (offspring == 2)
-				delete_single_node(node.swap_node(node.in_order_successor()));
-			else{
-				resolve_double_black(node);
-				*(node.parent_branch()) = nullptr;
-				this->_node_alloc.destroy(temp);
-				this->_value_alloc.destroy(&(temp->value()));
-				this->_node_alloc.deallocate(temp, 1);
-			}
-		}
-
-//////////------------------------ TRANSVERSE-----------------------////////////////////
-public:
-		void	level_order_transverse() 
-		{
-			vector<node_type*>	ptr_vec;
-			int					i = 0;
-
-			if (!root())
-				return;
-			ptr_vec.push_back(root());
-			while (ptr_vec.size() > i)
-			{
-				if (ptr_vec[i]->left_child())
-					ptr_vec.push_back(ptr_vec[i]->left_child());
-				if ((ptr_vec[i]->right_child()))
-					ptr_vec.push_back(ptr_vec[i]->right_child());
-				i++;
-			}
-		}
-
-//////////------------------------ PRINTERS -----------------------////////////////////
-
-		void	print_tree_in_order() const
-		{
-			stack<const node_type*>	temp;
-			const node_type*			current = root();
-
-			while (current || !(temp.empty()))
-			{
-				while (current)
-				{
-					temp.push(current);
-					current = current->left_child();
-				}
-				while (!(temp.empty()) && !current)
-				{
-					std::cout << " ->" << temp.top()->value() << "\t(" << temp.top()->color() << ", " 
-						<< temp.top()->balance_factor() << ", " << temp.top()->parent()->value() << ")" << std::endl;
-					current = temp.top()->right_child();
-					temp.pop();
-				}
-			}
-			std::cout << "--------------------" << std::endl;
-
-		}
-
-		void	print_map_tree_in_order() const
-		{
-			stack<const node_type*>	temp;
-			const node_type*			current = root();
-
-			while (current || !(temp.empty()))
-			{
-				while (current)
-				{
-					temp.push(current);
-					current = current->left_child();
-				}
-				while (!(temp.empty()) && !current)
-				{
-					std::cout << " ->" << temp.top()->value().first
-							<< " : " << temp.top()->value().second << "\t(" << temp.top()->color() << ", " 
-						<< temp.top()->balance_factor() << ", " << temp.top()->parent()->value().first << ")" << std::endl;
-					current = temp.top()->right_child();
-					temp.pop();
-				}
-			}
-			std::cout << "--------------------" << std::endl;
-
-		}
-
-		void	print_tree_by_level() const
-		{
-			vector<node_type*>	ptr_vec;
-			size_t					i = 0;
-
-			if (!root())
-				return;
-			ptr_vec.push_back(root());
-			while (ptr_vec.size() > i)
-			{
-				std::cout << " ->" << ptr_vec[i]->value() << "\t(" << ptr_vec[i]->color() << ", " 
-								<< ptr_vec[i]->balance_factor() << ", " 
-							<< ptr_vec[i]->parent()->value() << ")" << std::endl;
-				if (ptr_vec[i]->left_child())
-					ptr_vec.push_back(ptr_vec[i]->left_child());
-				if ((ptr_vec[i]->right_child()))
-					ptr_vec.push_back(ptr_vec[i]->right_child());
-				
-				i++;
-			}
-			std::cout << "--------------------" << std::endl;
-		}
-
-		void	print_tree_map_by_level() const
-		{
-			vector<node_type*>	ptr_vec;
-			size_t					i = 0;
-
-			if (!root())
-				return;
-			ptr_vec.push_back(root());
-			while (ptr_vec.size() > i)
-			{
-				std::cout << " ->" << ptr_vec[i]->value().first
-							<< " : " << ptr_vec[i]->value().second << "\t(" << ptr_vec[i]->color() << ", " 
-							<< ptr_vec[i]->balance_factor() << ", " 
-							<< ptr_vec[i]->parent()->value().first << ")" << std::endl;
-				if (ptr_vec[i]->left_child())
-					ptr_vec.push_back(ptr_vec[i]->left_child());
-				if ((ptr_vec[i]->right_child()))
-					ptr_vec.push_back(ptr_vec[i]->right_child());
-				
-				i++;
-			}
-			std::cout << "--------------------" << std::endl;
-		}
-
-//////////------------------------ HELPERS -----------------------////////////////////
-
-		template<class U>
-		struct	key_equals : binary_function<value_type, U, bool>
-		{
-			bool	operator()(const value_type& lhs, const U& rhs) { return lhs.first == rhs; }
-		};
-
-		template <class U>
-		iterator	find_equal(const U& key) const
-		{
-			node_type*	node = root();
-
-			while (node != nullptr && !key_equals<U>()(node->value(), key))
-			{
-				if (key < node->value().first)
-					node = node->left_child();
-				else
-					node = node->right_child();
-			}
-			return iterator(node);
-		}
-
-		template <class U>
-		size_type	count(const U& key) const
-		{
-			iterator	elem = find_equal(key);
-			if (elem) { return 1; }
-			return 0;
-		}
-
-		node_type*	search(const T& value)
-		{
-			node_type*	node = root();
-
-			while (node != nullptr && node->value() != value)
-			{
-				if (Compare()(value, node->value()))
-					node = node->left_child();
-				else
-					node = node->right_child();
-			}
-			return node;
-		}
-
-		const node_type*	search(const T& value) const
-		{
-			node_type*	node = root();
-
-			while (node != nullptr && node->value() != value)
-			{
-				if (Compare()(value, node->value()))
-					node = node->left_child();
-				else
-					node = node->right_child();
-			}
-			return node;
-		}
-private:
-		int		determine_setup(node_type& node)
-		{
-			if (node.parent()->is_left() && node.is_left())
-				return LL;
-			else if (node.parent()->is_left() && node.is_right())
-				return LR;
-			else if (node.parent()->is_right() && node.is_left())
-				return RL;
-			return RR;
-		}
-
-		node_type&	predecessor(node_type& node)
-		{
-			node_type*	max;
-
-			max = node->left_child();
-			while (max->right_child())
-				max = max->right_child();
-			return *max;
-		}
-
-		node_type&	successor(node_type& node)
-		{
-			node_type*	min;
-
-			min = node->right_child();
-			while (min->left_child())
-				min = min->left_child();
-			return *min;
-		}
-
-		int	balance_factor(node_type& node)
-		{
-			return node.balance_factor();
-		}
-
-//////////------------------------ REBALANCE -----------------------////////////////////
 
 		void	rotate_to_balance(node_type& node)
 		{
@@ -572,54 +677,17 @@ private:
 				return 6;
 			return 0;
 		}
-//////////------------------------ TESTING -----------------------////////////////////
-public :
-		void	test_node()
-		{
-			PRINT("<<<<<--------->>>>>>", GREEN);
-			print_tree_by_level();
-			print_tree_in_order();
-		}
-
-		void	test_map()
-		{
-			PRINT("<<<<<--------->>>>>>", GREEN);
-			print_tree_map_by_level();
-			print_map_tree_in_order();
-		}
-
-		void	swap(RBTree& other)
-		{
-			node_type*			this_root = this->root();
-			node_type*			this_begin_ptr = this->_begin_ptr;
-			size_t				this_size = this->_size;
-			value_allocator		this_value_alloc = this->_value_alloc;
-			node_allocator		this_node_alloc = this->_node_alloc;
-
-			this->_root_parent.link_left_child(other.root());
-			if (other.size())
-				this->_begin_ptr = other._begin_ptr;
-			else
-				this->_begin_ptr = this->end();
-			this->_size = other._size;
-			this->_value_alloc = other._value_alloc;
-			this->_node_alloc = other._node_alloc;
-			other._root_parent.link_left_child(this_root);
-			if (this_size)
-				other._begin_ptr = this_begin_ptr;
-			else
-				other._begin_ptr = other.end();
-			other._size = this_size;
-			other._value_alloc = this_value_alloc;
-			other._node_alloc = this_node_alloc;
-		}
+	public:
+		// Compare	key_comp() const { return _compare; }
 
 	protected:
 		node_type						_root_parent;
 		node_type*						_begin_ptr;
 		size_t							_size;
-		value_allocator					_value_alloc;
+		Compare							_compare;
+		Allocator						_alloc;
 		node_allocator					_node_alloc;
+
 	};
 
 }

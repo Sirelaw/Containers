@@ -26,8 +26,9 @@ namespace ft
 									_left_child(other.left_child()) , _value(other.value()), _color(other.color()) { }
 		~Node() { }
 
-		Node& operator=(const Node& to_assign) { 
-			if (this != &to_assign){
+		Node& operator=(const Node& to_assign) 
+		{ 
+			if (this != &to_assign) {
 				_parent = (to_assign.parent());
 				_right_child = (to_assign.right_child());
 				_left_child = (to_assign.left_child());

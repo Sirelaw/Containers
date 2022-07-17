@@ -46,6 +46,34 @@ main3:
 	@$(CC) $(FLAGS) main3.o -o $(NAME)
 	@echo "$(NAME) executable compiled for main3!"
 
+main4:
+	@c++ main4.cpp -c
+	@$(CC) $(FLAGS) main4.o -o $(NAME)
+	@echo "$(NAME) executable compiled for main4!"
+
+vector_test_ft:
+	@c++ vector_test.cpp -c $(FLAGS) -DFT=1
+	@$(CC) $(FLAGS) vector_test.o -o $(NAME)
+	@echo "$(NAME) executable compiled for FT_vector_test!"
+	@./containers
+
+vector_test_std:
+	@c++ vector_test.cpp -c $(FLAGS) -DFT=0
+	@$(CC) $(FLAGS) vector_test.o -o $(NAME)
+	@echo "$(NAME) executable compiled for STD_vector_test!"
+	@./containers
+
+map_test_ft:
+	@c++ set_tester.cpp -c $(FLAGS) -DFT=1
+	@$(CC) $(FLAGS) set_tester.o -o $(NAME)
+	@echo "$(NAME) executable compiled for FT_map_test!"
+	@./containers
+
+map_test_std:
+	@c++ set_tester.cpp -c $(FLAGS) -DFT=0
+	@$(CC) $(FLAGS) set_tester.o -o $(NAME)
+	@echo "$(NAME) executable compiled for STD_map_test!"
+	@./containers
 
 
 obj:

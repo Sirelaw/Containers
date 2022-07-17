@@ -62,6 +62,8 @@ int	main()
 	PRINT(my_map2.size(), RED);
 	my_map.swap(my_map2);
 	PRINT(my_map2.count((my_map2.begin() + 1)->first), RED);
+	// PRINT(std_map.lower_bound((std_map.begin() + 1)->first), RED);
+	PRINT((std_map.upper_bound((++std_map.begin())->first))->first, RED);
 	// for(std::map<int, std::string>::iterator iter = std_map.begin(); iter != std_map.end(); ++iter)
 	// {
 	// 	std::cout << "key------------->: " << iter->first << "\tvalue: " << iter->second << std::endl;

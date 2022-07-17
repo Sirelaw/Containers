@@ -5,7 +5,7 @@
 #include <string>
 
 #include "IteratorTraits.hpp"
-#include "verbose.hpp"
+// #include "verbose.hpp"
 
 namespace ft
 {
@@ -20,26 +20,33 @@ namespace ft
 		typedef	const value_type& 				const_reference;
 		typedef	T*								pointer;
 		typedef	const T*						const_pointer;
-		typedef	bidirectional_iterator_tag		iterator_category;
+		typedef	random_access_iterator_tag		iterator_category;
 
 		//---------------------------------------------------------------------------//
 
 	public:
-		vecIterator(T* ptr = nullptr) : _ptr(ptr)						{ }
+		vecIterator(T* ptr = nullptr) : _ptr(ptr)						{ }	
 		vecIterator(const vecIterator& other) : _ptr(other.getPtr())	{ }
 		~vecIterator(){}
 
 		vecIterator&							operator=(T* ptr) { _ptr = ptr; return *this; }
-		vecIterator&							operator=(vecIterator& other) { _ptr = other.getPtr(); return *this; }
+		template<typename T1>
+		vecIterator&							operator=(vecIterator<T1>& other) { _ptr = other.getPtr(); return *this; }						
 		
-		operator								pointer() const { return (_ptr); }
+		operator 								vecIterator<const T>() const { return (_ptr); }
 
-		bool									operator==(const vecIterator& rawIterator)const{return (_ptr == rawIterator.getConstPtr()); }
-		bool									operator!=(const vecIterator& rawIterator)const{return (_ptr != rawIterator.getConstPtr()); }
-		bool									operator>(const vecIterator& rawIterator)const{ return ( _ptr > rawIterator.getConstPtr()); }
-		bool									operator>=(const vecIterator& rawIterator)const{return (_ptr >= rawIterator.getConstPtr()); }
-		bool									operator<(const vecIterator& rawIterator)const{return (_ptr < rawIterator.getConstPtr()); }
-		bool									operator<=(const vecIterator& rawIterator)const{return (_ptr <= rawIterator.getConstPtr()); }
+		template<typename T1>
+		bool									operator==(const vecIterator<T1>& rawIterator)const{return (_ptr == rawIterator.getConstPtr()); }
+		template<typename T1>
+		bool									operator!=(const vecIterator<T1>& rawIterator)const{return (_ptr != rawIterator.getConstPtr()); }
+		template<typename T1>
+		bool									operator>(const vecIterator<T1>& rawIterator)const{ return ( _ptr > rawIterator.getConstPtr()); }
+		template<typename T1>
+		bool									operator>=(const vecIterator<T1>& rawIterator)const{return (_ptr >= rawIterator.getConstPtr()); }
+		template<typename T1>
+		bool									operator<(const vecIterator<T1>& rawIterator)const{return (_ptr < rawIterator.getConstPtr()); }
+		template<typename T1>
+		bool									operator<=(const vecIterator<T1>& rawIterator)const{return (_ptr <= rawIterator.getConstPtr()); }
 
 		vecIterator&							operator+=(const difference_type& movement) { _ptr += movement; return (*this); }
 		vecIterator&							operator-=(const difference_type& movement) { _ptr -= movement; return (*this); }
@@ -50,8 +57,10 @@ namespace ft
 		vecIterator								operator+(const difference_type& movement) const { vecIterator temp(*this); temp += movement; return (temp); }
 		vecIterator								operator-(const difference_type& movement) const { vecIterator temp(*this); temp -= movement; return (temp); }
 
-		difference_type							operator-(const vecIterator& rawIterator) const { return (this->getConstPtr() - rawIterator.getConstPtr()); }
+		template<typename T1>
+		difference_type							operator-(const vecIterator<T1>& rawIterator) const { return (this->getConstPtr() - rawIterator.getConstPtr()); }
 
+		T&										operator[](difference_type pos) 		{ return *(_ptr + pos); }
 		T&										operator*(){ return *_ptr; }
 		const T&								operator*() const { return *_ptr; }
 		T*										operator->() const { return _ptr; }
@@ -62,6 +71,11 @@ namespace ft
 	protected:
 		T*	_ptr;
 	};
+
+	template<typename T1, typename T2>
+	vecIterator<T2>								operator+(const T1& movement, const vecIterator<T2>& iter) { vecIterator<T2> temp(iter); temp += movement; return (temp); }
+	template<typename T1, typename T2>
+	vecIterator<T2>								operator-(const T1& movement, const vecIterator<T2>& iter) { vecIterator<T2> temp(iter); temp -= movement; return (temp); }
 
 	template<typename T>
 	std::ostream& operator<<(std::ostream& out, vecIterator<T> iter) {out << iter.getConstPtr(); return out; }

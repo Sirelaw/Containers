@@ -20,10 +20,9 @@ namespace ft
 	typedef std::bidirectional_iterator_tag  	bidirectional_iterator_tag;
 	typedef std::random_access_iterator_tag 	random_access_iterator_tag;
 
-	template<typename iterator>
-	class iterator_traits
+	template< typename iterator >
+	struct iterator_traits
 	{
-	public:
 		typedef	typename iterator::value_type			value_type;
 		typedef	typename iterator::difference_type		difference_type;
 		typedef	typename iterator::reference			reference;
@@ -31,10 +30,9 @@ namespace ft
 		typedef	typename iterator::iterator_category	iterator_category;
 	};
 
-	template< class T >
+	template< typename T >
 	struct iterator_traits<T*>
 	{
-	public:
 		typedef	T										value_type;
 		typedef	std::ptrdiff_t							difference_type;
 		typedef	T&										reference;
@@ -42,10 +40,9 @@ namespace ft
 		typedef	random_access_iterator_tag				iterator_category;	
 	};
 
-	template< class T >
+	template< typename T >
 	struct iterator_traits<const T*>
 	{
-	public:
 		typedef	T										value_type;
 		typedef	std::ptrdiff_t							difference_type;
 		typedef	const value_type&						reference;
