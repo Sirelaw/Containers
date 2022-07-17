@@ -1,97 +1,133 @@
-#include "Vector.hpp"
-#include "Stack.hpp"
-#include <vector>
-#include <stack>
-#include <map>
 #include <iostream>
-#include <algorithm>
-#include "verbose.hpp"
-#include "Node.hpp"
-#include "BSTree.hpp"
-#include "RBTree.hpp"
-#include "Pair.hpp"
-#include "Map.hpp"
-
 #include <string>
-#include <string_view>
- 
-void	check()
+#include <deque>
+#include "./src/utils/verbose.hpp"
+
+# ifndef FT
+# define FT 1
+# endif
+
+#if FT 
+	#include "./src/Stack.hpp"
+	#include "./src/Vector.hpp"
+	#include "./src/Map.hpp"
+#else //CREATE A REAL STL EXAMPLE
+	#include <vector>
+	#include <stack>
+	#include <map>
+	namespace ft = std;
+#endif
+
+#include <stdlib.h>
+
+#define MAX_RAM 2294967296
+#define BUFFER_SIZE 4096
+
+struct Buffer
 {
-	system("leaks containers");
-}
+	int idx;
+	char buff[BUFFER_SIZE];
+};
 
-int	main()
+
+#define COUNT (MAX_RAM / (int)sizeof(Buffer))
+
+template<typename T>
+class MutantStack : public ft::stack<T>
 {
-	std::map<int, std::string>	std_map;
-	ft::map<int, std::string>	my_map;
-	ft::map<int, std::string>	my_map2;
+public:
+	MutantStack() {}
+	MutantStack(const MutantStack<T>& src) { *this = src; }
+	MutantStack<T>& operator=(const MutantStack<T>& rhs) 
+	{
+		this->c = rhs.c;
+		return *this;
+	}
+	~MutantStack() {}
 
-	my_map.insert(ft::make_pair(1, "1: In my map"));
-	my_map.insert(ft::make_pair(2, "2: In my map"));
-	my_map.insert(ft::make_pair(3, "3: In my map"));
-	my_map.insert(ft::make_pair(4, "4: In my map"));
-	my_map.insert(ft::make_pair(5, "5: In my map"));
-	my_map.insert(ft::make_pair(6, "6: In my map"));
+	typedef typename ft::stack<T>::container_type::iterator iterator;
 
-	// my_map2.insert(ft::make_pair(1, "1: In my map2"));
-	// my_map2.insert(ft::make_pair(2, "2: In my map2"));
-	// my_map2.insert(ft::make_pair(3, "3: In my map2"));
-	// my_map2.insert(ft::make_pair(4, "4: In my map2"));
-	// my_map2.insert(ft::make_pair(5, "5: In my map2"));
-	// my_map2.insert(ft::make_pair(6, "6: In my map2"));
+	iterator begin() { return this->c.begin(); }
+	iterator end() { return this->c.end(); }
+};
 
-	std_map.insert(std::make_pair(1, "1: In std map"));
-	std_map.insert(std::make_pair(2, "2: In std map"));
-	std_map.insert(std::make_pair(3, "3: In std map"));
-	std_map.insert(std::make_pair(4, "4: In std map"));
-	std_map.insert(std::make_pair(5, "5: In std map"));
-	std_map.insert(std::make_pair(6, "6: In std map"));
+	void	check()
+	{
+		system("leaks containers");
+	}
+
+int main(int argc, char** argv) 
+{
+	// atexit(check);
+	if (argc != 2)
+	{
+		std::cerr << "Usage: ./test seed" << std::endl;
+		std::cerr << "Provide a seed please" << std::endl;
+		std::cerr << "Count value:" << COUNT << std::endl;
+		return 1;
+	}
+	const int seed = atoi(argv[1]);
+	srand(seed);
+
+	ft::vector<std::string> vector_str;
+	ft::vector<int> vector_int;
+	ft::stack<int> stack_int;
+	ft::vector<Buffer> vector_buffer;
+	ft::stack<Buffer, std::deque<Buffer> > stack_deq_buffer;
+	ft::map<int, int> map_int;
+
+	for (int i = 0; i < COUNT; i++)
+	{
+		vector_buffer.push_back(Buffer());
+	}
+
+	for (int i = 0; i < COUNT; i++)
+	{
+		const int idx = rand() % COUNT;
+		vector_buffer[idx].idx = 5;
+	}
+	ft::vector<Buffer>().swap(vector_buffer);
+
+	try
+	{
+		for (int i = 0; i < COUNT; i++)
+		{
+			const int idx = rand() % COUNT;
+			vector_buffer.at(idx);
+			std::cerr << "Error: THIS VECTOR SHOULD BE EMPTY!!" <<std::endl;
+		}
+	}
+	catch(const std::exception& e)
+	{
+		//NORMAL ! :P
+	}
 	
-
-	for(ft::map<int, std::string>::iterator iter = my_map.begin(); iter != my_map.end(); ++iter)
+	for (int i = 0; i < COUNT; ++i)
 	{
-		std::cout << "map\tkey: " << iter->first << "\tvalue: " << (&iter)->second << std::endl;
-		
+		map_int.insert(ft::make_pair(rand(), rand()));
 	}
-	// for(ft::map<int, std::string>::iterator iter = my_map2.begin(); iter != my_map2.end(); ++iter)
-	// {
-	// 	std::cout << "map2\tkey: " << iter->first << "\tvalue: " << (&iter)->second << std::endl;
-		
-	// }
-	PRINT(my_map.size(), RED);
-	PRINT(my_map2.size(), RED);
-	my_map.swap(my_map2);
-	PRINT(my_map2.count((my_map2.begin() + 1)->first), RED);
-	// PRINT(std_map.lower_bound((std_map.begin() + 1)->first), RED);
-	PRINT((std_map.upper_bound((++std_map.begin())->first))->first, RED);
-	// for(std::map<int, std::string>::iterator iter = std_map.begin(); iter != std_map.end(); ++iter)
-	// {
-	// 	std::cout << "key------------->: " << iter->first << "\tvalue: " << iter->second << std::endl;
-	// }
-	// std_map.erase(std_map.cbegin(), std_map.cend());
-	// PRINT((my_map.begin() + 2)->first, RED);
-	// my_map.erase(my_map.begin(), my_map.begin() + 2);
+	PRINT(map_int.size(), GREEN);
+	PRINT(COUNT, GREEN);
 
-	// for(ft::map<int, std::string>::iterator iter = my_map.begin(); iter != my_map.end(); ++iter)
-	// {
-	// 	std::cout << "key: " << iter->first << "\tvalue: " << (&iter)->second << std::endl;
-		
-	// }
-
-	// for(std::map<int, std::string>::iterator iter = std_map.begin(); iter != std_map.end(); ++iter)
-	// {
-	// 	std::cout << "key------------>: " << iter->first << "\tvalue: " << iter->second << std::endl;
-	// }
-
-	for(ft::map<int, std::string>::iterator iter = my_map.begin(); iter != my_map.end(); ++iter)
+	int sum = 0;
+	for (int i = 0; i < 10000; i++)
 	{
-		std::cout << "map\tkey: " << iter->first << "\tvalue: " << iter->second << std::endl;
+		int access = rand();
+		// PRINT(access, RED);
+		sum += map_int[access];
 	}
-	// for(ft::map<int, std::string>::iterator iter = my_map2.begin(); iter != my_map2.end(); ++iter)
-	// {
-	// 	std::cout << "map2\tkey: " << iter->first << "\tvalue: " << iter->second << std::endl;
-	// }
+	std::cout << "should be constant with the same seed: " << sum << std::endl;
 
-	// PRINT(std_map[1], RED);
-	// PRINT(my_map[1], RED);
+	{
+		ft::map<int, int> copy = map_int;
+	}
+	MutantStack<char> iterable_stack;
+	for (char letter = 'a'; letter <= 'z'; letter++)
+		iterable_stack.push(letter);
+	for (MutantStack<char>::iterator it = iterable_stack.begin(); it != iterable_stack.end(); it++)
+	{
+		std::cout << *it;
+	}
+	std::cout << std::endl;
+	return (0);
 }

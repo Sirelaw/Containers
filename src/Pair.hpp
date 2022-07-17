@@ -1,8 +1,6 @@
 #ifndef PAIR_HPP
 #define PAIR_HPP
 
-#include <iostream>
-#include <string>
 
 namespace ft
 {

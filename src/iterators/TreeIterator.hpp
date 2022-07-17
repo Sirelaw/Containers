@@ -1,11 +1,8 @@
 #ifndef TREEITERATOR_HPP
 #define TREEITERATOR_HPP
 
-#include <iostream>
-#include <string>
-
 #include "IteratorTraits.hpp"
-#include "Node.hpp"
+#include "../base/Node.hpp"
 namespace ft
 {
 

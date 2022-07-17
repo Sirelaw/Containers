@@ -2,9 +2,9 @@
 #define SET_HPP
 
 #include "Pair.hpp"
-#include "RBTree.hpp"
-#include "IteratorTraits.hpp"
-#include "Algorithm.hpp"
+#include "./base/RBTree.hpp"
+#include "./iterators/IteratorTraits.hpp"
+#include "./utils/Algorithm.hpp"
 
 namespace ft
 {
@@ -28,9 +28,9 @@ namespace ft
 		typedef typename tree_type::pointer									pointer;
 		typedef typename tree_type::reference								reference;
 		typedef typename tree_type::const_reference							const_reference;
-		typedef typename tree_type::iterator								iterator;
+		typedef typename tree_type::const_iterator							iterator;
 		typedef typename tree_type::const_iterator							const_iterator;
-		typedef typename tree_type::reverse_iterator						reverse_iterator;
+		typedef typename tree_type::const_reverse_iterator					reverse_iterator;
 		typedef typename tree_type::const_reverse_iterator					const_reverse_iterator;
 		typedef typename tree_type::size_type								size_type;
 		typedef typename tree_type::insert_return_type						insert_return_type;
@@ -41,12 +41,13 @@ namespace ft
 		iterator								end(){ return _tree.end(); }
 		const_iterator							begin() const { return _tree.begin(); }
 		const_iterator							end() const { return _tree.end(); }
-		const_iterator							cbegin() const { return _tree.cbegin(); }
-		const_iterator							cend() const { return _tree.cend(); }
 		reverse_iterator						rbegin(){ return _tree.rbegin(); }
 		reverse_iterator						rend(){ return _tree.rend(); }
 		const_reverse_iterator					rbegin() const { return _tree.crbegin(); }
 		const_reverse_iterator					rend() const { return _tree.crend(); }
+	private: // constant iterators were not present in c++98
+		const_iterator							cbegin() const { return _tree.cbegin(); }
+		const_iterator							cend() const { return _tree.cend(); }
 		const_reverse_iterator					crbegin() const { return _tree.crbegin(); }
 		const_reverse_iterator					crend() const { return _tree.crend(); }
 
@@ -75,7 +76,7 @@ namespace ft
 
 		allocator_type	get_allocator() const { return _alloc; }
 		
-	
+	private: // set_at was not available untill c++11
 		mapped_type& at(const key_type& key)
 		{ 
 			iterator	temp = find(key);
@@ -93,7 +94,7 @@ namespace ft
 				throw std::out_of_range("ft::set::at:: key not found");
 			return (temp->second);
 		};
-	
+	public:
 		mapped_type&			operator[](const key_type pos)
 		{
 			try
@@ -128,14 +129,18 @@ namespace ft
 
 		bool				empty() const { return size() == 0; }
 		size_type			size() const { return _tree.size(); }
-		size_type			max_size() const { return std::numeric_limits<difference_type>::max(); }
+		size_type			max_size() const { return _tree.max_size();}
 
 
 
 		void				clear() { return _tree.clear(); }
 
-		void				erase(iterator pos) { return _tree.erase(pos); }
-		void				erase(iterator first, iterator last) { return _tree.erase(first, last); }
+		void				erase(iterator pos) { _tree.erase(*pos); }
+		void				erase(iterator first, iterator last) 
+		{
+			while (first != last)
+				_tree.erase(*(first++));
+		}
 		size_type 			erase(const Key& key) { return _tree.erase(key); }
 
 		void				swap(set& other)
@@ -152,15 +157,15 @@ namespace ft
 
 		size_type			count(const key_type& key) const { return _tree.count(key); }
 
-		iterator			find(const Key& key) { return _tree.find_equal(key); }
+		iterator			find(const key_type& key) { return _tree.find_equal(key); }
 
-		const_iterator		find(const Key& key) const { return _tree.find_equal(key); }
-		iterator			lower_bound(const Key& key) { return _tree.lower_bound(key); }
-		const_iterator		lower_bound(const Key& key) const { return _tree.lower_bound(key); }
-		iterator			upper_bound(const Key& key) { return _tree.upper_bound(key); }
-		const_iterator		upper_bound(const Key& key) const { return _tree.upper_bound(key); }
-		pair<iterator,iterator> equal_range( const Key& key )		{ return _tree.equal_range(key); }
-		pair<const_iterator,const_iterator> equal_range( const Key& key ) const { return _tree.equal_range(key); }
+		const_iterator		find(const key_type& key) const { return _tree.find_equal(key); }
+		iterator			lower_bound(const key_type& key) { return _tree.lower_bound(key); }
+		const_iterator		lower_bound(const key_type& key) const { return _tree.lower_bound(key); }
+		iterator			upper_bound(const key_type& key) { return _tree.upper_bound(key); }
+		const_iterator		upper_bound(const key_type& key) const { return _tree.upper_bound(key); }
+		pair<iterator,iterator> equal_range( const key_type& key )		{ return _tree.equal_range(key); }
+		pair<const_iterator,const_iterator> equal_range( const key_type& key ) const { return _tree.equal_range(key); }
 
 		key_compare key_comp() const { return _key_compare; }
 		value_compare value_comp() const { return _key_compare; }
@@ -178,7 +183,7 @@ namespace ft
 	{
 		if (!(lhs.size() == rhs.size()))
 			return false;
-		return ft::equal(lhs.cbegin(), lhs.cend(), rhs.cbegin(), ft::equal_compare<ft::pair<Key, T> >());
+		return ft::equal(lhs.begin(), lhs.end(), rhs.begin(), ft::equal_to<Key>());
 	}
 	
 	template< class Key, class Compare, class Alloc >
@@ -192,7 +197,7 @@ namespace ft
 	bool operator<( const ft::set<Key,Compare,Alloc>& lhs, 
 					const ft::set<Key,Compare,Alloc>& rhs )
 	{
-		return ft::lexicographical_compare(lhs.cbegin(), lhs.cend(), rhs.cbegin(), rhs.cend());
+		return ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
 	}
 	
 	template< class Key, class Compare, class Alloc >

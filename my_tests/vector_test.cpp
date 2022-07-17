@@ -19,8 +19,8 @@
 # endif
 
 #if FT 
-	#include "Stack.hpp"
-	#include "Vector.hpp"
+	#include "../src/Stack.hpp"
+	#include "../src/Vector.hpp"
 #else //CREATE A REAL STL EXAMPLE
 	#include <vector>
 	#include <stack>
@@ -85,9 +85,6 @@ class foo {
 		value_type	value;
 		bool		_verbose;
 };
-
-// #define COUNT 10
-// #define S_COUNT 5
 
 struct	S_Class
 {
@@ -164,8 +161,6 @@ void	is_empty(ft::vector<int> const &vct)
 	std::cout << "is_empty: " << vct.empty() << std::endl;
 }
 
-
-
 int	main()
 {
 	struct timeval	start;
@@ -188,7 +183,7 @@ int	main()
 		vec_S.push_back(S_Class());
 		vec_S[i].idx = i;
 	}
-	std::cout << "vector push_back:\033[32m\t" << time_diff(start) << " ms\033[0m" << std::endl;
+	std::cout << "vector push_back:\033[32m\t\t" << time_diff(start) << " ms\033[0m" << std::endl;
 
 	gettimeofday(&start, NULL); //insert
 	for (int i = 0; i < S_COUNT; i++)
@@ -217,7 +212,7 @@ int	main()
 	{
 		vec_S.pop_back();
 	}
-	std::cout << "vector pop_back:\033[32m\t" << time_diff(start) << " ms\033[0m" << std::endl;
+	std::cout << "vector pop_back:\033[32m\t\t" << time_diff(start) << " ms\033[0m" << std::endl;
 
 	gettimeofday(&start, NULL); //random_access
 	for (int i = 0; i < COUNT; i++)
@@ -248,7 +243,7 @@ int	main()
 	PRINT((vec_S == vec_S2), BLUE);
 	PRINT((vec_S != vec_S2), BLUE);
 	vec_S2.erase(vec_S2.begin(), vec_S2.end());
-	std::cout << "vector compares:\033[32m\t" << time_diff(start) << " ms\033[0m" << std::endl;
+	std::cout << "vector compares:\033[32m\t\t" << time_diff(start) << " ms\033[0m" << std::endl;
 
 	gettimeofday(&start, NULL); //stack operations
 	for(ft::vector<S_Class>::const_iterator iter = vec_S.begin(); iter < vec_S.end(); ++iter)
@@ -304,6 +299,6 @@ int	main()
 	printSize(vct, true);
 }
 
-	atexit(check);
+	// atexit(check);
 	return 0;
 }

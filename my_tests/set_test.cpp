@@ -7,7 +7,7 @@
 # endif
 
 #if FT 
-	#include "Set.hpp"
+	#include "../src/Set.hpp"
 #  define TESTED_NAMESPACE ft
 #else //CREATE A REAL STL EXAMPLE
 	#include <set>
@@ -16,6 +16,11 @@
 #endif
 
 #define _pair TESTED_NAMESPACE::pair
+
+void	check()
+{
+	system("leaks containers");
+}
 
 // --- Class foo
 template <typename T>
@@ -105,6 +110,7 @@ void	printReverse(TESTED_NAMESPACE::set<T1> &st)
 		std::cout << "-> " << printPair(it, false) << std::endl;
 	std::cout << "_______________________________________________" << std::endl;
 }
+/////////////////////////////////// bounds
 
 typedef TESTED_NAMESPACE::set<int>::iterator ft_iterator;
 typedef TESTED_NAMESPACE::set<int>::const_iterator ft_const_iterator;
@@ -162,5 +168,6 @@ int		main(void)
 	ft_bound(st, 7);
 
 	printSize(st);
+	// atexit(check);
 	return (0);
 }

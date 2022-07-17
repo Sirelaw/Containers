@@ -1,11 +1,14 @@
 #ifndef VECTOR_HPP
 #define VECTOR_HPP
 
-#include <memory>
-#include <limits>
-#include <stdexcept>
-#include "VecIterator.hpp"
-#include "utils.hpp"
+// #include <memory>
+// #include <limits>
+// #include <stdexcept>
+#include "./iterators/IteratorTraits.hpp"
+#include "./iterators/VecIterator.hpp"
+#include "./iterators/reverse_iterator.hpp"
+#include "./utils/type_traits.hpp"
+#include "./utils/utils.hpp"
 
 namespace ft
 {
@@ -16,7 +19,7 @@ namespace ft
 		//------------------ Typedefs------------------------------------------//
 		typedef	T										value_type;
 		typedef	Allocator								allocator_type;
-		typedef	std::size_t								size_type;
+		typedef	unsigned long							size_type;
 		typedef	std::ptrdiff_t							difference_type;
 		typedef	value_type&								reference;
 		typedef	const value_type& 						const_reference;
@@ -158,8 +161,9 @@ namespace ft
 		T*										data(){ return begin().getPtr(); }
 		const T*								data() const { return cbegin().getConstPtr(); }
 		bool									empty() const { return size() == 0; }
-		size_type								max_size() const { return std::min<size_type>(_alloc.max_size(), 
-																			std::numeric_limits<difference_type>::max());}
+		size_type								max_size() const { return (less<size_type>()(_alloc.max_size(), 
+														std::numeric_limits<difference_type>::max()) ? _alloc.max_size() :
+														std::numeric_limits<difference_type>::max() );}
 		void									clear()
 		{
 			for (iterator iter = begin(); iter != end(); ++iter)

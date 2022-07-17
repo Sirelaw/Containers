@@ -1,46 +1,14 @@
-#ifndef LESS_HPP
-#define LESS_HPP
+#ifndef REVERSE_ITERATOR_HPP
+#define REVERSE_ITERATOR_HPP
+
 #include "IteratorTraits.hpp"
 
 namespace ft
 {
-	template <class Arg1, class Arg2, class Result>
-	struct binary_function
-	{
-		typedef Arg1	first_argument_type;
-		typedef Arg2	second_argument_type;
-		typedef Result	result_type;
-	};
 
-	template< class T >
-	struct less : binary_function<T, T, bool>
-	{
-		bool	operator()( const T& lhs, const T& rhs ) const
-		{
-			return (lhs < rhs);
-		}
-	};
-
-	template< class T >
-	struct equal_to : binary_function<T, T, bool>
-	{
-		bool	operator()( const T& lhs, const T& rhs ) const
-		{
-			return (less<T>()(lhs, rhs) == less<T>()(rhs, lhs));
-		}
-	};
-
-	template< class T >
-	struct equal_pair
-	{
-		bool operator()( T& lhs_first, T& lhs_second, T& rhs_first, T& rhs_second ) const
-		{
-			return (equal_to<T>()(lhs_first, rhs_first) && equal_to<T>()(lhs_second, rhs_second));
-		}
-	};
 
 	template<class Category, class T, class Distance = ptrdiff_t,
-         class Pointer = T*, class Reference = T&>
+			class Pointer = T*, class Reference = T&>
 	struct iterator
 	{
 		typedef T        value_type;
@@ -108,57 +76,5 @@ namespace ft
 	reverse_iterator<Iter1>			operator+(typename reverse_iterator<Iter1>::difference_type movement, const reverse_iterator<Iter1>& iter) { reverse_iterator<Iter1> temp(iter); temp += movement; return (temp); }
 	template<typename Iter1, typename Iter2>
 	typename reverse_iterator<Iter1>::difference_type	operator-(const reverse_iterator<Iter1>& iter1, const reverse_iterator<Iter2>& iter2) { return (iter2.base() - iter1.base()); }
-
-
-	template<bool>
-	struct	enable_if {};
-
-	template<>
-	struct	enable_if<true>
-	{
-		typedef	void type;
-	};
-
-	template<class T, T v>
-	struct	integral_constant
-	{
-		static const T	value = v;
-		typedef T		value_type;
-		typedef integral_constant	type;
-		operator	value_type() const { return value; }
-		value_type	operator()() const { return value; }
-	};
-
-	typedef integral_constant<bool, true>	true_type;
-	typedef integral_constant<bool, false>	false_type;
-
-
-	template <class T>	struct is_integral						: public false_type {};
-	template <>			struct is_integral<bool>				: public true_type {};
-	template <>			struct is_integral<char>				: public true_type {};
-	template <>			struct is_integral<signed char>			: public true_type {};
-	template <>			struct is_integral<unsigned char>		: public true_type {};
-	template <>			struct is_integral<wchar_t>				: public true_type {};
-	#if __cplusplus > 201703L || defined(__cpp_char8_t)
-	template <>			struct is_integral<char8_t>				: public true_type {};
-	#endif
-	#ifndef _LIBCPP_HAS_NO_UNICODE_CHARS
-	template <>			struct is_integral<char16_t>			: public true_type {};
-	template <>			struct is_integral<char32_t>			: public true_type {};
-	#endif
-	template <>			struct is_integral<short>				: public true_type {};
-	template <>			struct is_integral<unsigned short>		: public true_type {};
-	template <>			struct is_integral<int>					: public true_type {};
-	template <>			struct is_integral<unsigned int>		: public true_type {};
-	template <>			struct is_integral<long>				: public true_type {};
-	template <>			struct is_integral<unsigned long>		: public true_type {};
-	template <>			struct is_integral<long long>			: public true_type {};
-	template <>			struct is_integral<unsigned long long>	: public true_type {};
-	#ifdef __SIZEOF_INT128__
-	template <>			struct is_integral<__int128_t>			: public true_type {};
-	template <>			struct is_integral<__uint128_t>			: public true_type {};		
-	#endif // sizeof_int128_
 }
-
-
 #endif

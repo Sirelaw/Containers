@@ -1,11 +1,7 @@
 #ifndef VECITERATOR_HPP
 #define VECITERATOR_HPP
 
-#include <iostream>
-#include <string>
-
 #include "IteratorTraits.hpp"
-// #include "verbose.hpp"
 
 namespace ft
 {
@@ -80,7 +76,5 @@ namespace ft
 	template<typename T>
 	std::ostream& operator<<(std::ostream& out, vecIterator<T> iter) {out << iter.getConstPtr(); return out; }
 }
-
-
 
 #endif

@@ -1,12 +1,12 @@
 #ifndef RBTREE_HPP
 #define RBTREE_HPP
 
-#include <iostream>
-#include <string>
 #include "Node.hpp"
-#include "utils.hpp"
-#include "TreeIterator.hpp"
-#include "Pair.hpp"
+#include "../utils/type_traits.hpp"
+#include "../utils/utils.hpp"
+#include "../iterators/TreeIterator.hpp"
+#include "../iterators/reverse_iterator.hpp"
+#include "../Pair.hpp"
 
 namespace ft
 {
@@ -167,114 +167,12 @@ private:
 			}
 			return ft::make_pair(iterator(temp), true);
 		}
-///////////////////////// inserting with hint
-
-// iterator	__insert(node_pointer x, node_pointer y, const value_type& v) {
-//     ++node_count;
-//     node_pointer z = _node_alloc.allocate(1);
-// 	_node_alloc.construct(z, val)
-//     if (y == header || x != NIL || key_compare(KeyOfValue()(v), key(y))) {
-//         left(y) = z;  // also makes leftmost() = z when y == header
-//         if (y == header) {
-//             root() = z;
-//             rightmost() = z;
-//         } else if (y == leftmost())
-//             leftmost() = z;   // maintain leftmost() pointing to minimum node
-//     } else {
-//         right(y) = z;
-//         if (y == rightmost())
-//             rightmost() = z;   // maintain rightmost() pointing to maximum node
-//     }
-//     parent(z) = y;
-//     left(z) = NIL;
-//     right(z) = NIL;
-//     x = z;  // recolor and rebalance the tree
-//     color(x) = red;
-//     while (x != root() && color(parent(x)) == red) 
-//         if (parent(x) == left(parent(parent(x)))) {
-//             y = right(parent(parent(x)));
-//             if (color(y) == red) {
-//                 color(parent(x)) = black;
-//                 color(y) = black;
-//                 color(parent(parent(x))) = red;
-//                 x = parent(parent(x));
-//             } else {
-//                 if (x == right(parent(x))) {
-//                     x = parent(x);
-//                     rotate_left(x);
-//                 }
-//                 color(parent(x)) = black;
-//                 color(parent(parent(x))) = red;
-//                 rotate_right(parent(parent(x)));
-//             }
-//         } else {
-//             y = left(parent(parent(x)));
-//             if (color(y) == red) {
-//                 color(parent(x)) = black;
-//                 color(y) = black;
-//                 color(parent(parent(x))) = red;
-//                 x = parent(parent(x));
-//             } else {
-//                 if (x == left(parent(x))) {
-//                     x = parent(x);
-//                     rotate_right(x);
-//                 }
-//                 color(parent(x)) = black;
-//                 color(parent(parent(x))) = red;
-//                 rotate_left(parent(parent(x)));
-//             }
-//         }
-//     color(root()) = black;
-//     return iterator(z);
-// }
-	
-
-// iterator	insert(iterator position, const Value& v)
-// {
-//     if (position == begin())
-//         if (size() > 0 && _compare(v, *position))
-//             return __insert(position.getPtr(), position.getPtr(), v);
-//             // first argument just needs to be non-NIL 
-//         else
-//             return insert(v).first;
-//     else if (position == iterator(end()))
-//         if (_compare(key(rightmost()), KeyOfValue()(v)))
-//             return __insert(NIL, rightmost(), v);
-//         else
-//             return insert(v).first;
-//     else {
-//         iterator before = --position;
-//         if (_compare(key(before.node), KeyOfValue()(v))
-//             && _compare(KeyOfValue()(v), key(position.node)))
-//             if (right(before.node) == NIL)
-//                 return __insert(NIL, before.node, v); 
-//             else
-//                 return __insert(position.node, position.node, v);
-//                 // first argument just needs to be non-NIL 
-//         else
-//             return insert(v).first;
-//     }
-// }
-
-//////////// end insert with hint
 
 public:
 		insert_return_type	insert(const T& val)
 		{
 			return rebalance_after_insert(new_insert(val));
 		}
-
-		// iterator insert( iterator hint, const value_type& value )
-		// {
-		// 	return _tree.insert(hint, value);
-		// }
-
-		// template< class InputIt >
-		// void insert( InputIt first, InputIt last )
-		// {
-		// 	return _tree.insert(first, last);
-		// }
-
 
 //////////-------------------------- DELETE ------------------------////////////////////
 private:
@@ -322,10 +220,9 @@ public:
 				iter = temp++;
 			}
 		}
-		template <typename Key>
-		size_type erase( const Key& key )
+		size_type erase( const value_type& val )
 		{
-			iterator	elem = find_equal(key);
+			iterator	elem = find_equal(val);
 			if (elem == end())
 				return 0;
 			if (elem == iterator(_begin_ptr))
@@ -357,61 +254,68 @@ public:
 
 //////////------------------------ HELPERS -----------------------////////////////////
 
-		template <class Key>
-		iterator	find_equal(const Key& key)
+		iterator	find_equal(const value_type& val)
 		{
 			node_type*	node = root();
 
-			while (node != nullptr && !equal_to<Key>()(node->value().first, key))
+			while (node != nullptr)
 			{
-				if (key < node->value().first)
-					node = node->left_child();
-				else
-					node = node->right_child();
+				if (_compare(node->value(), val)){
+					if (_compare(val, node->value()))
+						return iterator(node);
+					else
+						node = node->right_child();
+				}
+				else{
+					if (!_compare(val, node->value()))
+						return iterator(node);
+					else
+						node = node->left_child();
+				}
 			}
-			if (!node)
-				return end();
-			return iterator(node);
+			return end();
 		}
 
-		template <class Key>
-		const_iterator	find_equal(const Key& key) const
+		const_iterator	find_equal(const value_type& val) const
 		{
-			node_type*	node = root();
+			const node_type*	node = root();
 
-			while (node != nullptr && !equal_to<Key>()(node->value().first, key))
+			while (node != nullptr)
 			{
-				if (key < node->value().first)
-					node = node->left_child();
-				else
-					node = node->right_child();
+				if (_compare(node->value(), val)){
+					if (_compare(val, node->value()))
+						return const_iterator(node);
+					else
+						node = node->right_child();
+				}
+				else{
+					if (!_compare(val, node->value()))
+						return const_iterator(node);
+					else
+						node = node->left_child();
+				}
 			}
-			if (!node)
-				return cend();
-			return const_iterator(node);
+			return cend();
 		}
 
-		template<class Key>
-		pair<iterator,iterator> equal_range( const Key& key )
+		pair<iterator,iterator> equal_range( const value_type& val )
 		{
-			return make_pair(lower_bound(key), upper_bound(key)); 
+			return make_pair(lower_bound(val), upper_bound(val)); 
 		}
 
-		template<class Key>
-		pair<const_iterator,const_iterator> equal_range( const Key& key ) const
+		pair<const_iterator,const_iterator> equal_range( const value_type& val ) const
 		{
-			return make_pair(lower_bound(key), upper_bound(key)); 
+			return make_pair(lower_bound(val), upper_bound(val)); 
 		}
 
-		template <class Key>
-		iterator	lower_bound(const Key& key)
+		iterator	lower_bound(const value_type& val)
 		{
 			node_type*	node = root();
 			iterator	result = end();
 
 			while (node != nullptr)
 			{
-				if (!less<Key>()(node->value().first, key))
+				if (!_compare(node->value(), val))
 				{
 					result = iterator(node);
 					node = (node->left_child());
@@ -422,16 +326,14 @@ public:
 			return result;
 		}
 
-		template <class Key>
-		const_iterator	lower_bound(const Key& key) const
+		const_iterator	lower_bound(const value_type& val) const
 		{
 			const node_type*	node = root();
 			const_iterator		result = cend();
 
 			while (node != nullptr)
 			{
-				if (!less<Key>()(node->value().first, key))
-				// if (!_compare(val, temp->value()))
+				if (!_compare(node->value(), val))
 				{
 					result = const_iterator(node);
 					node = (node->left_child());
@@ -442,15 +344,14 @@ public:
 			return result;
 		}
 
-		template<class Key>
-		iterator	upper_bound(const Key& key)
+		iterator	upper_bound(const value_type& val)
 		{
 			node_type*	node = root();
 			node_type*	result = end().getPtr();
 
 			while (node != nullptr)
 			{
-				if (less<Key>()(key, node->value().first))
+				if (_compare(val, node->value()))
 				{
 					result = node;
 					node = node->left_child();
@@ -458,18 +359,17 @@ public:
 				else
 					node = node->right_child();
 			}
-			return iterator(result);
+			return result;
 		}
 
-		template <class Key>
-		const_iterator upper_bound(const Key& key) const
+		const_iterator upper_bound(const value_type& val) const
 		{
 			const node_type*	node = root(); /* Current node. */
 			const_iterator		result = cend(); /* Last node which is greater than k. */
 
 			while (node != nullptr) 
 			{
-				if (less<Key>()(key, node->value().first))
+				if (_compare(val, node->value()))
 				{
 					result = const_iterator(node);
 					node = node->left_child();
@@ -480,16 +380,15 @@ public:
 			return result;
 		}
 
-		template <class U>
-		size_type	count(const U& key) const
+		size_type	count(const value_type& val) const
 		{
-			const_iterator	elem = find_equal(key);
+			const_iterator	elem = find_equal(val);
 			size_type	num;
 
 			if (elem != cend())
 			{
 				num = 1;
-				while (((++elem)->first < key) == (key < (elem)->first))
+				while (_compare(val, *(++elem)) == _compare(*(elem), val))
 					num++;
 				return num; 
 			}
@@ -518,6 +417,10 @@ public:
 			other._size = this_size;
 			other._node_alloc = this_node_alloc;
 		}
+
+		size_type					max_size() const { return (less<size_type>()(_node_alloc.max_size(), 
+											std::numeric_limits<difference_type>::max()) ? _node_alloc.max_size() :
+											std::numeric_limits<difference_type>::max() );}
 
 private:
 		int		determine_setup(node_type& node) const
@@ -677,8 +580,6 @@ private:
 				return 6;
 			return 0;
 		}
-	public:
-		// Compare	key_comp() const { return _compare; }
 
 	protected:
 		node_type						_root_parent;

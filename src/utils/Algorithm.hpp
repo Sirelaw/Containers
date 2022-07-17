@@ -1,17 +1,17 @@
 #ifndef ALGORITHM_HPP
 #define ALGORITHM_HPP
 
-#include "Pair.hpp"
+#include "../Pair.hpp"
 
 namespace ft
 {
 	template<class ValueType>
-	struct equal_compare : binary_function<ValueType, ValueType, bool>
+	struct map_equal_compare : binary_function<ValueType, ValueType, bool>
 	{
 	public:
 		bool	operator()( const ValueType& lhs, const ValueType& rhs ) const
 		{
-			return (lhs.first == rhs.first);
+			return (lhs.first < rhs.first) == (rhs.first < lhs.first);
 		}
 	};
 
@@ -19,7 +19,7 @@ namespace ft
 	ft::pair<InputIterator1, InputIterator2>	mismatch(InputIterator1 first1,
 														InputIterator1 last1,
 														InputIterator2 first2) {
-		while (first1 != last1 && *first1 == *first2) 
+		while (first1 != last1 && ((*first1 < *first2) == (*first2 < *first1))) 
 		{
 			++first1;
 			++first2;
