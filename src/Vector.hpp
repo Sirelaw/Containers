@@ -3,12 +3,14 @@
 
 // #include <memory>
 // #include <limits>
-// #include <stdexcept>
+#include <stdexcept>
 #include "./iterators/IteratorTraits.hpp"
 #include "./iterators/VecIterator.hpp"
 #include "./iterators/reverse_iterator.hpp"
 #include "./utils/type_traits.hpp"
 #include "./utils/utils.hpp"
+
+#include <iostream>
 
 namespace ft
 {
@@ -174,32 +176,40 @@ namespace ft
 		iterator 								insert( iterator pos, const T& value )
 		{
 			difference_type	step = pos - begin();
+			reverse_iterator r_iter;
 
 			reserve(size() + 1);
 			pos = begin() + step;
-			for (reverse_iterator r_iter = rbegin(); pos < r_iter.base(); ++r_iter)
-			{
-				_alloc.construct(r_iter.base().getPtr(), *r_iter);
-				_alloc.destroy((r_iter + 1).base().getPtr());
-			}
-			_alloc.construct(pos.getPtr(), value);
+			r_iter = rbegin();
+			_alloc.construct(r_iter.base().getPtr(), *r_iter);
 			++_size;
+			for (; pos < r_iter.base(); ++r_iter)
+			{
+				*(r_iter.base()) = *r_iter;
+			}
+			*pos = value;
 			return (pos);
 		}
 
 		void 									insert( iterator pos, size_type count, const T& value )
 		{
 			difference_type	step = pos - begin();
+			reverse_iterator r_iter;
 
 			reserve(size() + count);
 			pos = begin() + step;
-			for (reverse_iterator r_iter = rbegin(); pos < r_iter.base(); ++r_iter)
+			r_iter = rbegin();
+			for (size_type temp_count = count; temp_count; --temp_count)
 			{
 				_alloc.construct((r_iter - count + 1).base().getPtr(), *(r_iter));
-				_alloc.destroy((r_iter + 1).base().getPtr());
+				++r_iter;
+			}
+			for (; pos < r_iter.base(); ++r_iter)
+			{
+				*((r_iter - count + 1).base()) = *r_iter;
 			}
 			for(size_type i = count; i; --i)
-				_alloc.construct((pos + i - 1).getPtr(), value);
+				*(pos + i - 1) = value;
 			_size += count;
 		}
 
@@ -207,21 +217,27 @@ namespace ft
 		void 									insert( iterator pos, InputIt first, InputIt last,
 												typename ft::enable_if<!ft::is_integral<InputIt>::value>::type* = nullptr )
 		{
-			difference_type	step = pos - begin();
-			InputIt			temp = first;
-			size_type		count = 0;
+			difference_type		step = pos - begin();
+			InputIt				temp = first;
+			size_type			count = 0;
+			reverse_iterator	r_iter;
 
 			while (temp++ != last)
 				++count;
 			reserve(size() + count);
+			r_iter = rbegin();
 			pos = begin() + step;
-			for (reverse_iterator r_iter = rbegin(); pos < r_iter.base(); ++r_iter)
+			for (size_type temp_count = count; temp_count; --temp_count)
 			{
 				_alloc.construct((r_iter - count + 1).base().getPtr(), *(r_iter));
-				_alloc.destroy((r_iter + 1).base().getPtr());
+				++r_iter;
+			}
+			for (; pos < r_iter.base(); ++r_iter)
+			{
+				*((r_iter - count + 1).base()) = *r_iter;
 			}
 			for(size_type i = count; i; --i)
-				_alloc.construct((pos + i - 1).getPtr(), *(--last));
+				*(pos + i - 1) = *(--last);
 			_size += count;
 		}
 

@@ -1,6 +1,7 @@
 #ifndef RBTREE_HPP
 #define RBTREE_HPP
 
+#include <memory>
 #include "Node.hpp"
 #include "../utils/type_traits.hpp"
 #include "../utils/utils.hpp"
