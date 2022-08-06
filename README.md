@@ -17,6 +17,6 @@ References
 
 Useful resources
 
-[Red_Black Tree\n](https://www.youtube.com/watch?v=3RQtq7PDHog)
+[Red_Black Tree](https://www.youtube.com/watch?v=3RQtq7PDHog)
 
-[Templates\n](https://youtube.com/playlist?list=PLAe2BCBg8rkIicrIjA6LyjiMn8GFaS6pJ)
+[Templates](https://youtube.com/playlist?list=PLAe2BCBg8rkIicrIjA6LyjiMn8GFaS6pJ)
