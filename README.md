@@ -4,7 +4,6 @@ The standard C++ containers all have specific usage.
 To make sure full understanding of these containers is achieved, this project entails re-implementing them!
 
 References
-
 [std::map](https://en.cppreference.com/w/cpp/container/map)
 
 [std::set](https://en.cppreference.com/w/cpp/container/set)
