@@ -4,7 +4,7 @@
 #include "./src/utils/verbose.hpp"
 
 # ifndef FT
-# define FT 1
+# define FT 0
 # endif
 
 #if FT 
@@ -51,10 +51,10 @@ public:
 	iterator end() { return this->c.end(); }
 };
 
-	void	check()
-	{
-		system("leaks containers");
-	}
+void	check()
+{
+	system("leaks containers");
+}
 
 int main(int argc, char** argv) 
 {
@@ -129,5 +129,7 @@ int main(int argc, char** argv)
 		std::cout << *it;
 	}
 	std::cout << std::endl;
+
 	return (0);
+	
 }

@@ -2,7 +2,7 @@ NAME = containers
 
 CC = c++
 
-FLAGS = -std=c++98 -Wall -Wextra -Werror 
+FLAGS = -std=c++98 -Wall -Wextra -Werror -O3
 
 SRC_DIR = ./
 OBJ_DIR = ./obj/
@@ -83,6 +83,7 @@ obj:
 
 clean :
 	cd $(OBJ_DIR) && rm -rf $(OBJ_FILES)
+	rm ./*.o
 
 fclean : clean
 	rm -rf $(NAME)

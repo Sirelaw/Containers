@@ -36,7 +36,6 @@ namespace ft
 
 	public:	
 		typedef typename Allocator::template rebind< node_type >::other		node_allocator;
-		// typedef typename Allocator::template rebind< value_type >::other	value_allocator;
 		typedef node_type*													node_pointer;
 		typedef typename Allocator::pointer         						pointer;
     	typedef typename Allocator::const_pointer  							const_pointer;
@@ -138,9 +137,7 @@ private:
 			while (temp)
 			{
 				if (_compare(temp->value(), val)){
-					if (_compare(val, temp->value()))
-						return ft::make_pair(iterator(temp), false);
-					else if (temp->right_child())
+					if (temp->right_child())
 						temp = temp->right_child();
 					else{
 						temp->link_right_child(_node_alloc.allocate(1));
@@ -150,10 +147,8 @@ private:
 						break;
 					}
 				}
-				else{
-					if (!_compare(val, temp->value()))
-						return ft::make_pair(iterator(temp), false);
-					else if (temp->left_child())
+				else if (_compare(val, temp->value())){
+					if (temp->left_child())
 						temp = temp->left_child();
 					else{
 						temp->link_left_child(_node_alloc.allocate(1));
@@ -165,6 +160,8 @@ private:
 						break;
 					}
 				}
+				else
+					return ft::make_pair(iterator(temp), false);
 			}
 			return ft::make_pair(iterator(temp), true);
 		}
@@ -261,18 +258,12 @@ public:
 
 			while (node != nullptr)
 			{
-				if (_compare(node->value(), val)){
-					if (_compare(val, node->value()))
-						return iterator(node);
-					else
-						node = node->right_child();
-				}
-				else{
-					if (!_compare(val, node->value()))
-						return iterator(node);
-					else
-						node = node->left_child();
-				}
+				if (_compare(node->value(), val))
+					node = node->right_child();
+				else if (_compare(val, node->value()))
+					node = node->left_child();
+				else
+					return iterator(node);
 			}
 			return end();
 		}
@@ -283,18 +274,12 @@ public:
 
 			while (node != nullptr)
 			{
-				if (_compare(node->value(), val)){
-					if (_compare(val, node->value()))
-						return const_iterator(node);
-					else
-						node = node->right_child();
-				}
-				else{
-					if (!_compare(val, node->value()))
-						return const_iterator(node);
-					else
-						node = node->left_child();
-				}
+				if (_compare(node->value(), val))
+					node = node->right_child();
+				else if (_compare(val, node->value()))
+					node = node->left_child();
+				else
+					return const_iterator(node);
 			}
 			return cend();
 		}
@@ -389,9 +374,9 @@ public:
 			if (elem != cend())
 			{
 				num = 1;
-				while (_compare(val, *(++elem)) == _compare(*(elem), val))
-					num++;
-				return num; 
+				// while (!_compare(val, *(++elem)) && !_compare(*(elem), val) && elem != cend())
+				// 	num++;
+				return num;
 			}
 			return 0;
 		}

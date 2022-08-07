@@ -2,6 +2,7 @@
 #define ALGORITHM_HPP
 
 #include "../Pair.hpp"
+#include "../iterators/IteratorTraits.hpp"
 
 namespace ft
 {
@@ -80,6 +81,28 @@ namespace ft
 			if (comp(*first2++, *first1++)) return false;
 		}
 		return first1 == last1 && first2 != last2;
+	}
+
+	template <class InputIterator>
+	unsigned long	ptr_distance(InputIterator first, InputIterator second, random_access_iterator_tag)
+	{
+		return (second - first);
+	}
+
+	template <class InputIterator>
+	unsigned long	ptr_distance(InputIterator first, InputIterator second, bidirectional_iterator_tag)
+	{
+		unsigned long	count = 0;
+
+		while (second-- != first)
+			++count;
+		return (count);
+	}
+
+	template <class InputIterator>
+	unsigned long	ptr_distance(InputIterator first, InputIterator second)
+	{
+		return (ptr_distance(first, second, typename iterator_traits<InputIterator>::iterator_category()));
 	}
 
 }

@@ -109,14 +109,7 @@ namespace ft
 	public:
 		mapped_type&			operator[](const key_type pos)
 		{
-			try
-			{
-				return (at(pos));
-			}
-			catch(const std::out_of_range& e)
-			{
-				return(this->insert(ft::make_pair(pos, mapped_type())).first->second);
-			}
+			return(this->insert(ft::make_pair(pos, mapped_type())).first->second);
 		}
 
 		insert_return_type	insert (const value_type& value)
