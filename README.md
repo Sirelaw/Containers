@@ -5,6 +5,8 @@ To make sure full understanding of these containers is achieved, this project en
 
 References
 
+[C++ standard library as at Aug 2016](https://web.archive.org/web/20160811224408/http://www.stepanovpapers.com/butler.hpl.hp/stl/stl/)
+
 [std::map](https://en.cppreference.com/w/cpp/container/map)
 
 [std::set](https://en.cppreference.com/w/cpp/container/set)
