@@ -7,18 +7,20 @@ This project is a deep dive into the internals of the C++ Standard Template Libr
 
 For an Embedded Engineer, memory is a precious resource. This project demonstrates:
 
-    Manual Memory Management: Implementing custom std::allocator logic.
+- Manual Memory Management: Implementing custom std::allocator logic.
 
-    Data Structure Design: Building Red-Black Trees for map and dynamic arrays for vector.
+- Data Structure Design: Building Red-Black Trees for map and dynamic arrays for vector.
 
-    Template Metaprogramming: Using SFINAE (enable_if) and type traits to mimic STL behavior.
+- Template Metaprogramming: Using SFINAE (enable_if) and type traits to mimic STL behavior.
 
-    Algorithm Efficiency: Ensuring O(logn) for tree operations and O(1) amortized for vector insertions.
+- Algorithm Efficiency: Ensuring O(logn) for tree operations and O(1) amortized for vector insertions.
 
-Container,Underlying Structure,Key Features
-ft::vector,Dynamic Array,"Amortized growth, iterator traits, and full std::allocator integration."
-ft::map,Red-Black Tree,"Self-balancing tree architecture, bidirectional iterators, and key-value pair handling."
-ft::stack,Container Adaptor,Built on top of ft::vector to provide LIFO logic.
+
+| Container | Underlying Structure | Key Features |
+| :--- | :--- | :--- |
+| **`ft::vector`** | Dynamic Array | [cite_start]Amortized growth, iterator traits, and full `std::allocator` integration.  |
+| **`ft::map`** | Red-Black Tree | [cite_start]Self-balancing tree architecture, bidirectional iterators, and key-value pair handling.  |
+| **`ft::stack`** | Container Adaptor | [cite_start]Built on top of `ft::vector` to provide LIFO logic.  |
 
 ## Technical Highlights
 
@@ -30,11 +32,11 @@ The most complex part of the project was the map. I implemented a Red-Black Tree
 
 I built custom iterators from scratch, including:
 
-    Random Access Iterators for Vector.
+- Random Access Iterators for Vector.
 
-    Bidirectional Iterators for Map.
+- Bidirectional Iterators for Map.
 
-    Reverse Iterators using a template wrapper.
+- Reverse Iterators using a template wrapper.
 
 ### 3. SFINAE & Type Traits
 
@@ -44,25 +46,31 @@ To ensure that my containers behave exactly like the STL, I implemented enable_i
 
 ### Prerequisites
 
-    A C++ compiler (e.g., clang++ or g++)
+- A C++ compiler (e.g., clang++ or g++)
 
-    make
+- make
 
 ### Installation
 
-    Bash
-    
-    git clone https://github.com/Sirelaw/Containers.git
-    cd Containers
-    make
+```
+Bash
+```
+```  
+git clone https://github.com/Sirelaw/Containers.git
+cd Containers
+make
+```
 
 ### Running the Comparison Test
 
 This project includes a test suite that compares the performance and output of ft:: containers against the standard std:: containers.
 
-    Bash
-    
-    ./container_test
+```
+Bash
+```
+```
+./container_test
+```
 
 References
 
