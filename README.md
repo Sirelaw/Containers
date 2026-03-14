@@ -18,9 +18,9 @@ For an Embedded Engineer, memory is a precious resource. This project demonstrat
 
 | Container | Underlying Structure | Key Features |
 | :--- | :--- | :--- |
-| **`ft::vector`** | Dynamic Array | [cite_start]Amortized growth, iterator traits, and full `std::allocator` integration.  |
-| **`ft::map`** | Red-Black Tree | [cite_start]Self-balancing tree architecture, bidirectional iterators, and key-value pair handling.  |
-| **`ft::stack`** | Container Adaptor | [cite_start]Built on top of `ft::vector` to provide LIFO logic.  |
+| **`ft::vector`** | Dynamic Array | Amortized growth, iterator traits, and full `std::allocator` integration.  |
+| **`ft::map`** | Red-Black Tree | Self-balancing tree architecture, bidirectional iterators, and key-value pair handling.  |
+| **`ft::stack`** | Container Adaptor | Built on top of `ft::vector` to provide LIFO logic.  |
 
 ## Technical Highlights
 
