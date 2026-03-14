@@ -36,7 +36,7 @@ I built custom iterators from scratch, including:
 
     Reverse Iterators using a template wrapper.
 
-3. SFINAE & Type Traits
+### 3. SFINAE & Type Traits
 
 To ensure that my containers behave exactly like the STL, I implemented enable_if and is_integral to handle function overloading and prevent ambiguous template instantiations.
 
