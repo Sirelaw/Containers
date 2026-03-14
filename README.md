@@ -52,10 +52,8 @@ To ensure that my containers behave exactly like the STL, I implemented enable_i
 
 ### Installation
 
-```
-Bash
-```
-```  
+```bash
+
 git clone https://github.com/Sirelaw/Containers.git
 cd Containers
 make
@@ -65,10 +63,8 @@ make
 
 This project includes a test suite that compares the performance and output of ft:: containers against the standard std:: containers.
 
-```
-Bash
-```
-```
+```bash
+
 ./container_test
 ```
 
