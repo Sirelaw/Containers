@@ -21,10 +21,12 @@ ft::map,Red-Black Tree,"Self-balancing tree architecture, bidirectional iterator
 ft::stack,Container Adaptor,Built on top of ft::vector to provide LIFO logic.
 
 ## Technical Highlights
-1. The Red-Black Tree Implementation
+
+### 1. The Red-Black Tree Implementation
 
 The most complex part of the project was the map. I implemented a Red-Black Tree to ensure that search, insertion, and deletion always happen in logarithmic time. This involved handling complex rotations and re-coloring during node insertion/deletion to maintain tree balance.
-2. Iterator Architecture
+
+### 2. Iterator Architecture
 
 I built custom iterators from scratch, including:
 
@@ -48,19 +50,19 @@ To ensure that my containers behave exactly like the STL, I implemented enable_i
 
 ### Installation
 
-Bash
-
-git clone https://github.com/Sirelaw/Containers.git
-cd Containers
-make
+    Bash
+    
+    git clone https://github.com/Sirelaw/Containers.git
+    cd Containers
+    make
 
 ### Running the Comparison Test
 
 This project includes a test suite that compares the performance and output of ft:: containers against the standard std:: containers.
 
-Bash
-
-./container_test
+    Bash
+    
+    ./container_test
 
 References
 
