@@ -1,5 +1,5 @@
 # C++ Containers: Reimplementing the STL (C++98)
-"Don't just use the library. Be the library."
+## "Don't just use the library. Be the library."
 
 This project is a deep dive into the internals of the C++ Standard Template Library. The challenge: Reimplementing core STL containers from scratch, adhering strictly to the C++98 standard, without using the std library for the underlying data structures.
 
